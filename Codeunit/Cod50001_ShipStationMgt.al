@@ -593,9 +593,12 @@ codeunit 50001 "ShipStation Mgt."
         txtLabel: Text;
         txtBeforeName: Text;
         WhseShipDocNo: Code[20];
+        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Existed!';
+        errorShipStationOrderNotExist: TextConst ENU = 'ShipStation Order is not Existed!';
     begin
-        if (DocNo = '') or (not _SH.Get(_SH."Document Type"::Order, DocNo)) or (_SH."ShipStation Order ID" = '') then exit(false);
-        // if not FindWarehouseSipment(DocNo, WhseShipDocNo) then exit(false); // comment to test Create Label and Attache to Warehouse Shipment
+        if (DocNo = '') or (not _SH.Get(_SH."Document Type"::Order, DocNo)) or (_SH."ShipStation Order ID" = '') then Error(errorShipStationOrderNotExist);
+        // comment to test Create Label and Attache to Warehouse Shipment
+        if not FindWarehouseSipment(DocNo, WhseShipDocNo) then Error(errorWhseShipNotExist);
 
         // Get Order from Shipstation to Fill Variables
         JSText := Connect2ShipStation(1, '', StrSubstNo('/%1', _SH."ShipStation Order ID"));
@@ -607,13 +610,10 @@ codeunit 50001 "ShipStation Mgt."
         // Update Order From Label
         UpdateOrderFromLabel(DocNo, JSText);
 
-        WhseShipDocNo := '111'; // code to test attache
-
         // Add Lable to Shipment
         jsLabelObject.ReadFrom(JSText);
         txtLabel := GetJSToken(jsLabelObject, 'labelData').AsValue().AsText();
         txtBeforeName := _SH."No." + '-' + GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
-
         SaveLabel2Shipment(txtBeforeName, txtLabel, WhseShipDocNo);
 
         // Update Sales Header From ShipStation
