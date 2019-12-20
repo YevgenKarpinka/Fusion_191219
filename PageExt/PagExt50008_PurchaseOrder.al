@@ -8,6 +8,7 @@ pageextension 50008 "Purchase Order Ext." extends "Purchase Order"
             field("IC Document No."; "IC Document No.")
             {
                 ApplicationArea = All;
+                Editable = false;
             }
         }
     }

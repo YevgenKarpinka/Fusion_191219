@@ -8,6 +8,7 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
             field("IC Document No."; "IC Document No.")
             {
                 ApplicationArea = All;
+                Editable = false;
             }
         }
         addafter("Shipping Agent Code")
