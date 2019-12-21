@@ -620,8 +620,6 @@ codeunit 50001 "ShipStation Mgt."
         JSText := Connect2ShipStation(1, '', StrSubstNo('/%1', _SH."ShipStation Order ID"));
         JSObject.ReadFrom(JSText);
         UpdateSalesHeaderFromShipStation(_SH."No.", JSObject);
-
-        Message('Label Created and Attached to Warehouse Shipment %1', WhseShipDocNo);
     end;
 
     procedure VoidLabel2OrderInShipStation(DocNo: Code[20]): Boolean
@@ -666,9 +664,8 @@ codeunit 50001 "ShipStation Mgt."
         WhseShipLine: Record "Warehouse Shipment Line";
     begin
         with WhseShipLine do begin
-            SetCurrentKey("Source Type", "Source Subtype", "Source No.");
-            SetRange("Source Type", Database::"Sales Header");
-            SetRange("Source Subtype", 1);
+            SetCurrentKey("Source Document", "Source No.");
+            SetRange("Source Document", "Source Document"::"Sales Order");
             SetRange("Source No.", _DocNo);
             if FindFirst() then begin
                 _WhseShipDcoNo := "No.";

@@ -110,7 +110,7 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                     ApplicationArea = All;
                     CaptionML = ENU = 'Create/Update Order', RUS = 'Создать/Обновить Заказ';
                     Image = CreateDocuments;
-                    Visible = Status = Status::Open;
+                    Visible = Status = Status::Released;
 
                     trigger OnAction()
                     var
@@ -160,19 +160,23 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                     ApplicationArea = All;
                     CaptionML = ENU = 'Create Label to Order', RUS = 'Создать бирку заказа';
                     Image = PrintReport;
-                    Visible = "ShipStation Order Status" = "ShipStation Order Status"::Updated;
+                    Visible = "ShipStation Order Status" = "ShipStation Order Status"::Sent;
 
                     trigger OnAction()
                     var
                         ShipStationMgt: Codeunit "ShipStation Mgt.";
                         _SH: Record "Sales Header";
+                        Counter: Integer;
                     begin
                         if "ShipStation Order Key" = '' then Error(salesOrderNotRegisterInShipStation, "No.");
+
                         CurrPage.SetSelectionFilter(_SH);
                         if _SH.FindSet(false, false) then
                             repeat
                                 ShipStationMgt.CreateLabel2OrderInShipStation(_SH."No.");
+                                Counter += 1;
                             until _SH.Next() = 0;
+                        Message('Label Created and Attached to Warehouse Shipment %1', Counter);
                     end;
                 }
                 action("Void Label to Order")
@@ -188,6 +192,8 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                         _SH: Record "Sales Header";
                     begin
                         if "ShipStation Order Key" = '' then Error(salesOrderNotRegisterInShipStation, "No.");
+                        if "ShipStation Shipment ID" <> '' then exit;
+
                         CurrPage.SetSelectionFilter(_SH);
                         if _SH.FindSet(false, false) then
                             repeat
