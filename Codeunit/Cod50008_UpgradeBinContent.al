@@ -6,15 +6,20 @@ codeunit 50101 "Upgrade Bin Content"
     var
         BinContent: Record "Bin Content";
         BinConMod: Record "Bin Content";
+        LotNo: Code[50];
     begin
         with BinContent do begin
             SetCurrentKey("Lot No.");
             SetRange("Lot No.", '');
             if FindSet(true, false) then
                 repeat
-                    BinConMod.Get("Location Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code");
-                    BinConMod.Validate("Lot No.", GetLotNoFromWhseEntry("Location Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code"));
-                    BinConMod.Modify();
+                    if BinConMod.Get("Location Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code") then begin
+                        LotNo := GetLotNoFromWhseEntry("Location Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code");
+                        if LotNo <> '' then begin
+                            BinConMod.Validate("Lot No.", LotNo);
+                            BinConMod.Modify();
+                        end;
+                    end;
                 until Next() = 0;
         end;
     end;
@@ -31,9 +36,8 @@ codeunit 50101 "Upgrade Bin Content"
             SetRange("Variant Code", VariantCode);
             SetRange("Unit of Measure Code", UoMCode);
             if FindLast() then
-                exit(WhseEntry."Lot No.")
-            else
-                exit('');
+                exit("Lot No.");
         end;
+        exit('');
     end;
 }
