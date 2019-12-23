@@ -626,6 +626,7 @@ codeunit 50001 "ShipStation Mgt."
         JSText: Text;
         JSObject: JsonObject;
         WhseShipDocNo: Code[20];
+        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Existed!';
     begin
         if (DocNo = '') or (not _SH.Get(_SH."Document Type"::Order, DocNo)) or (_SH."ShipStation Shipment ID" = '') then exit(false);
 
@@ -639,6 +640,9 @@ codeunit 50001 "ShipStation Mgt."
         JSText := Connect2ShipStation(1, '', StrSubstNo('/%1', _SH."ShipStation Order ID"));
         JSObject.ReadFrom(JSText);
         UpdateSalesHeaderFromShipStation(_SH."No.", JSObject);
+
+        if not FindWarehouseSipment(DocNo, WhseShipDocNo) then Error(errorWhseShipNotExist);
+        DeleteAttachment(WhseShipDocNo);
     end;
 
     local procedure UpdateOrderFromLabel(DocNo: Code[20]; jsonText: Text);
@@ -673,23 +677,20 @@ codeunit 50001 "ShipStation Mgt."
 
     local procedure SaveLabel2Shipment(_txtBefore: Text; _txtLabelBase64: Text; _WhseShipDocNo: Code[20])
     var
-        Base64Convert: Codeunit "Base64 Convert";
         RecRef: RecordRef;
         WhseShipHeader: Record "Warehouse Shipment Header";
         lblOrder: TextConst ENU = 'SalesOrder', RUS = 'SalesOrder';
-        DocumentAttachment: Record "Document Attachment";
         FileName: Text;
-        LabelToPDF: Text;
+        tempblob: Codeunit "Temp Blob";
     begin
         RecRef.OPEN(DATABASE::"Warehouse Shipment Header");
         WhseShipHeader.Get(_WhseShipDocNo);
         RecRef.GETTABLE(WhseShipHeader);
-        LabelToPDF := Base64Convert.FromBase64(_txtLabelBase64);
         FileName := StrSubstNo('%1-%2.pdf', _txtBefore, lblOrder);
-        SaveAttachment2WhseShmt(RecRef, FileName, LabelToPDF);
+        SaveAttachment2WhseShmt(RecRef, FileName, _txtLabelBase64);
     end;
 
-    local procedure SaveAttachment2WhseShmt(RecRef: RecordRef; FileName: Text; LabelToPDF: Text)
+    local procedure SaveAttachment2WhseShmt(RecRef: RecordRef; IncomingFileName: Text; LabelBase64: Text)
     var
         FieldRef: FieldRef;
         _InStream: InStream;
@@ -697,20 +698,19 @@ codeunit 50001 "ShipStation Mgt."
         RecNo: Code[20];
         DocType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
         LineNo: Integer;
-        TempBlob: Codeunit "Temp Blob";
+        TenantMedia: Record "Tenant Media";
         DocumentAttachment: Record "Document Attachment";
         FileManagement: Codeunit "File Management";
-        IncomingFileName: Text;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         with DocumentAttachment do begin
-            IncomingFileName := FileName;
             Init();
             Validate("File Extension", FileManagement.GetExtension(IncomingFileName));
             Validate("File Name", CopyStr(FileManagement.GetFileNameWithoutExtension(IncomingFileName), 1, MaxStrLen("File Name")));
 
-            TempBlob.CreateOutStream(_OutStream);
-            _OutStream.WriteText(LabelToPDF);
-            TempBlob.CreateInStream(_InStream);
+            TenantMedia.Content.CreateOutStream(_OutStream);
+            Base64Convert.FromBase64(LabelBase64, _OutStream);
+            TenantMedia.Content.CreateInStream(_InStream);
             "Document Reference ID".ImportStream(_InStream, IncomingFileName);
 
             Validate("Table ID", RecRef.Number);
@@ -718,6 +718,29 @@ codeunit 50001 "ShipStation Mgt."
             RecNo := FieldRef.Value;
             Validate("No.", RecNo);
             Insert(true);
+        end;
+    end;
+
+    local procedure DeleteAttachment(_WhseShipDocNo: Code[20])
+    var
+        DocumentAttachment: Record "Document Attachment";
+        WhseShipHeader: Record "Warehouse Shipment Header";
+        _RecordRef: RecordRef;
+        _FieldRef: FieldRef;
+        RecNo: Code[20];
+    begin
+        _RecordRef.OPEN(DATABASE::"Warehouse Shipment Header");
+        WhseShipHeader.Get(_WhseShipDocNo);
+        _RecordRef.GETTABLE(WhseShipHeader);
+
+        with DocumentAttachment do begin
+            _FieldRef := _RecordRef.Field(1);
+            RecNo := _FieldRef.Value;
+
+            SetCurrentKey("Table ID", "No.");
+            SetRange("Table ID", _RecordRef.Number);
+            SetRange("No.", RecNo);
+            DeleteAll();
         end;
     end;
 
