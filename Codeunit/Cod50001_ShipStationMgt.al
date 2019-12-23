@@ -112,7 +112,7 @@ codeunit 50001 "ShipStation Mgt."
         JSObject.ReadFrom(JSText);
         errMessage := GetJSToken(JSObject, 'Message').AsValue().AsText();
         errExceptionMessage := GetJSToken(JSObject, 'ExceptionMessage').AsValue().AsText();
-        Error('Web service returned error:\\Status code: %1\Description: %2\Message: %3\Exception Message: %4\Body Request:\%5',
+        Error('Web service returned error:\\Status code: %1\\Description: %2\\Message: %3\\Exception Message: %4\\Body Request:\\%5',
             ResponseMessage.HttpStatusCode(), ResponseMessage.ReasonPhrase(), errMessage, errExceptionMessage, Body2Request);
 
     end;
@@ -286,7 +286,6 @@ codeunit 50001 "ShipStation Mgt."
 
 
         _jsonObject.WriteTo(_jsonText);
-        // Message(_jsonText);
         exit(_jsonObject);
     end;
 
@@ -604,8 +603,7 @@ codeunit 50001 "ShipStation Mgt."
         JSText := Connect2ShipStation(1, '', StrSubstNo('/%1', _SH."ShipStation Order ID"));
 
         JSObject.ReadFrom(JSText);
-        // Message(JSText);
-        JSText := Connect2ShipStation(3, FillValuesFromOrder(JSObject), '');
+        JSText := Connect2ShipStation(3, FillValuesFromOrder(JSObject, DocNo), '');
 
         // Update Order From Label
         UpdateOrderFromLabel(DocNo, JSText);
@@ -636,8 +634,6 @@ codeunit 50001 "ShipStation Mgt."
         JSObject.WriteTo(JSText);
         JSText := Connect2ShipStation(8, JSText, '');
         JSObject.ReadFrom(JSText);
-
-        Message(GetJSToken(JSObject, 'message').AsValue().AsText(), '%1', WhseShipDocNo);
 
         // Update Sales Header From ShipStation
         JSText := Connect2ShipStation(1, '', StrSubstNo('/%1', _SH."ShipStation Order ID"));
@@ -765,12 +761,13 @@ codeunit 50001 "ShipStation Mgt."
             _List += '|' + _subString;
     end;
 
-    local procedure FillValuesFromOrder(_JSObject: JsonObject): Text
+    local procedure FillValuesFromOrder(_JSObject: JsonObject; DocNo: Code[20]): Text
     var
         JSObjectHeader: JsonObject;
         JSText: Text;
         jsonNull: JsonObject;
         jsonInsurance: JsonObject;
+        jsonInternational: JsonObject;
     begin
 
         if GetJSToken(_JSObject, 'carrierCode').AsValue().IsNull then
@@ -791,8 +788,7 @@ codeunit 50001 "ShipStation Mgt."
 
         JSObjectHeader.Add('shipFrom', jsonShipFromFromCompaniInfo());
 
-        if not GetJSToken(_JSObject, 'shipTo').isValue() then
-            JSObjectHeader.Add('shipTo', GetJSToken(_JSObject, 'shipTo').AsObject());
+        JSObjectHeader.Add('shipTo', jsonShipToFromSH(DocNo));
 
         if not GetJSToken(_JSObject, 'insuranceOptions').IsValue then begin
             jsonInsurance := GetJSToken(_JSObject, 'insuranceOptions').AsObject();
@@ -800,8 +796,11 @@ codeunit 50001 "ShipStation Mgt."
                 JSObjectHeader.Add('insuranceOptions', GetJSToken(_JSObject, 'insuranceOptions').AsObject());
         end;
 
-        if not GetJSToken(_JSObject, 'internationalOptions').IsValue then
-            JSObjectHeader.Add('internationalOptions', GetJSToken(_JSObject, 'internationalOptions').AsObject());
+        if not GetJSToken(_JSObject, 'internationalOptions').IsValue then begin
+            jsonInternational := GetJSToken(_JSObject, 'internationalOptions').AsObject();
+            if not GetJSToken(jsonInternational, 'contents').AsValue().IsNull then
+                JSObjectHeader.Add('internationalOptions', GetJSToken(_JSObject, 'internationalOptions').AsObject());
+        end;
 
         if not GetJSToken(_JSObject, 'advancedOptions').IsValue then
             JSObjectHeader.Add('advancedOptions', GetJSToken(_JSObject, 'advancedOptions').AsObject());

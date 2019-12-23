@@ -108,27 +108,22 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                 action("Create/Update Order")
                 {
                     ApplicationArea = All;
-                    CaptionML = ENU = 'Create/Update Order', RUS = 'Создать/Обновить Заказ';
+                    CaptionML = ENU = 'Create Order', RUS = 'Создать Заказ';
                     Image = CreateDocuments;
-                    Visible = Status = Status::Released;
+                    Visible = (Status = Status::Released) and ("ShipStation Order Key" = '');
 
                     trigger OnAction()
                     var
                         ShipStationMgt: Codeunit "ShipStation Mgt.";
                         _SH: Record "Sales Header";
-                        lblOrdersList: TextConst ENU = 'List of Processed Orders:', RUS = 'Список обработанных Заказов:';
-                        txtOrdersList: Text;
+                        lblOrderCreated: TextConst ENU = 'Order Created in ShipStation!', RUS = 'Заказ в ShipStation создан!';
                     begin
                         CurrPage.SetSelectionFilter(_SH);
                         if _SH.FindSet(false, false) then
                             repeat
                                 ShipStationMgt.CreateOrderInShipStation(_SH."No.");
-                                if txtOrdersList = '' then
-                                    txtOrdersList := _SH."No."
-                                else
-                                    txtOrdersList += '\' + _SH."No.";
                             until _SH.Next() = 0;
-                        Message('%1 \%2', lblOrdersList, txtOrdersList);
+                        Message(lblOrderCreated);
                     end;
                 }
                 action("Get Rates")
@@ -155,18 +150,19 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                         end;
                     end;
                 }
-                action("Create Label to Order")
+                action("Create Label")
                 {
                     ApplicationArea = All;
-                    CaptionML = ENU = 'Create Label to Order', RUS = 'Создать бирку заказа';
+                    CaptionML = ENU = 'Create Label', RUS = 'Создать бирку';
                     Image = PrintReport;
-                    Visible = "ShipStation Order Status" = "ShipStation Order Status"::Sent;
+                    Visible = "ShipStation Order Key" <> '';
 
                     trigger OnAction()
                     var
                         ShipStationMgt: Codeunit "ShipStation Mgt.";
                         _SH: Record "Sales Header";
-                        Counter: Integer;
+                        lblLabelCreated: TextConst ENU = 'Label Created and Attached to Warehouse Shipment!',
+                                                    RUS = 'Бирка создана и прикреплена к Отгрузке!';
                     begin
                         if "ShipStation Order Key" = '' then Error(salesOrderNotRegisterInShipStation, "No.");
 
@@ -174,15 +170,14 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                         if _SH.FindSet(false, false) then
                             repeat
                                 ShipStationMgt.CreateLabel2OrderInShipStation(_SH."No.");
-                                Counter += 1;
                             until _SH.Next() = 0;
-                        Message('Label Created and Attached to Warehouse Shipment %1', Counter);
+                        Message(lblLabelCreated);
                     end;
                 }
-                action("Void Label to Order")
+                action("Void Label")
                 {
                     ApplicationArea = All;
-                    CaptionML = ENU = 'Void Label to Order', RUS = 'Отменить бирку заказа';
+                    CaptionML = ENU = 'Void Label', RUS = 'Отменить бирку';
                     Image = VoidCreditCard;
                     Visible = "ShipStation Shipment ID" <> '';
 
@@ -190,15 +185,17 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                     var
                         ShipStationMgt: Codeunit "ShipStation Mgt.";
                         _SH: Record "Sales Header";
+                        lblLabelVoided: TextConst ENU = 'Label Voided!',
+                                                    RUS = 'Бирка отменена!';
                     begin
                         if "ShipStation Order Key" = '' then Error(salesOrderNotRegisterInShipStation, "No.");
-                        if "ShipStation Shipment ID" <> '' then exit;
 
                         CurrPage.SetSelectionFilter(_SH);
                         if _SH.FindSet(false, false) then
                             repeat
                                 ShipStationMgt.VoidLabel2OrderInShipStation(_SH."No.");
                             until _SH.Next() = 0;
+                        Message(lblLabelVoided);
                     end;
                 }
             }
