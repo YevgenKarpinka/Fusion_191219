@@ -679,7 +679,7 @@ codeunit 50001 "ShipStation Mgt."
     var
         RecRef: RecordRef;
         WhseShipHeader: Record "Warehouse Shipment Header";
-        lblOrder: TextConst ENU = 'SalesOrder', RUS = 'SalesOrder';
+        lblOrder: TextConst ENU = 'LabelOrder', RUS = 'БиркаЗаказа';
         FileName: Text;
         tempblob: Codeunit "Temp Blob";
     begin
