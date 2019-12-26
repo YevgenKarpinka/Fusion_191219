@@ -71,7 +71,7 @@ pageextension 50003 "Sales Order List Ext." extends "Sales Order List"
                     ApplicationArea = All;
                     CaptionML = ENU = 'Create Orders', RUS = 'Создать Заказы';
                     Image = CreateDocuments;
-                    Visible = (Status = Status::Released) and ("ShipStation Order Key" = '');
+                    // Visible = (Status = Status::Released) and ("ShipStation Order Key" = '');
 
                     trigger OnAction()
                     var
@@ -80,7 +80,8 @@ pageextension 50003 "Sales Order List Ext." extends "Sales Order List"
                         lblOrdersCreated: TextConst ENU = 'Orders Created in ShipStation!', RUS = 'Заказы в ShipStation созданы!';
                     begin
                         CurrPage.SetSelectionFilter(_SH);
-                        _SH.SetRange(Status, _SH.Status::Open);
+                        _SH.SetRange(Status, _SH.Status::Released);
+                        _SH.SetFilter("ShipStation Order Key", '=%1', '');
                         if _SH.FindSet(false, false) then
                             repeat
                                 if (_SH.Status = _SH.Status::Released) and (_SH."ShipStation Order Key" = '') then
@@ -94,7 +95,7 @@ pageextension 50003 "Sales Order List Ext." extends "Sales Order List"
                     ApplicationArea = All;
                     CaptionML = ENU = 'Create Labels', RUS = 'Создать бирки';
                     Image = PrintReport;
-                    Visible = "ShipStation Order Key" <> '';
+                    // Visible = "ShipStation Order Key" <> '';
 
                     trigger OnAction()
                     var
@@ -104,6 +105,7 @@ pageextension 50003 "Sales Order List Ext." extends "Sales Order List"
                                                     RUS = 'Бирки созданы и прикреплены к Отгрузкам!';
                     begin
                         CurrPage.SetSelectionFilter(_SH);
+                        _SH.SetFilter("ShipStation Order Key", '<>%1', '');
                         if _SH.FindSet(false, false) then
                             repeat
                                 if _SH."ShipStation Order Key" <> '' then
@@ -126,10 +128,10 @@ pageextension 50003 "Sales Order List Ext." extends "Sales Order List"
                                                     RUS = 'Бирки отменены!';
                     begin
                         CurrPage.SetSelectionFilter(_SH);
+                        _SH.SetFilter("ShipStation Shipment ID", '<>%1', '');
                         if _SH.FindSet(false, false) then
                             repeat
-                                if _SH."ShipStation Shipment ID" <> '' then
-                                    ShipStationMgt.VoidLabel2OrderInShipStation(_SH."No.");
+                                ShipStationMgt.VoidLabel2OrderInShipStation(_SH."No.");
                             until _SH.Next() = 0;
                         Message(lblLabelsVoided);
                     end;

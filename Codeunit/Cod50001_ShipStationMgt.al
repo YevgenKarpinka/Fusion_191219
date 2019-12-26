@@ -603,7 +603,7 @@ codeunit 50001 "ShipStation Mgt."
         JSText := Connect2ShipStation(1, '', StrSubstNo('/%1', _SH."ShipStation Order ID"));
 
         JSObject.ReadFrom(JSText);
-        JSText := Connect2ShipStation(3, FillValuesFromOrder(JSObject, DocNo), '');
+        JSText := Connect2ShipStation(3, FillValuesFromOrder(JSObject, DocNo, GetLocationCode(DocNo)), '');
 
         // Update Order From Label
         UpdateOrderFromLabel(DocNo, JSText);
@@ -618,6 +618,18 @@ codeunit 50001 "ShipStation Mgt."
         JSText := Connect2ShipStation(1, '', StrSubstNo('/%1', _SH."ShipStation Order ID"));
         JSObject.ReadFrom(JSText);
         UpdateSalesHeaderFromShipStation(_SH."No.", JSObject);
+    end;
+
+    local procedure GetLocationCode(DocNo: Code[20]): Code[10]
+    var
+        _SalesLine: Record "Sales Line";
+    begin
+        with _SalesLine do begin
+            SetRange("Document No.", DocNo);
+            SetRange("Document Type", "Document Type"::Order);
+            if FindFirst() then exit("Location Code");
+        end;
+        exit('');
     end;
 
     procedure VoidLabel2OrderInShipStation(DocNo: Code[20]): Boolean
@@ -784,7 +796,7 @@ codeunit 50001 "ShipStation Mgt."
             _List += '|' + _subString;
     end;
 
-    local procedure FillValuesFromOrder(_JSObject: JsonObject; DocNo: Code[20]): Text
+    local procedure FillValuesFromOrder(_JSObject: JsonObject; DocNo: Code[20]; LocationCode: Code[20]): Text
     var
         JSObjectHeader: JsonObject;
         JSText: Text;
@@ -809,7 +821,7 @@ codeunit 50001 "ShipStation Mgt."
         if not GetJSToken(_JSObject, 'dimensions').isValue() then
             JSObjectHeader.Add('dimensions', GetJSToken(_JSObject, 'dimensions').AsObject());
 
-        JSObjectHeader.Add('shipFrom', jsonShipFromFromCompaniInfo());
+        JSObjectHeader.Add('shipFrom', jsonShipFrom(LocationCode));
 
         JSObjectHeader.Add('shipTo', jsonShipToFromSH(DocNo));
 
@@ -872,13 +884,45 @@ codeunit 50001 "ShipStation Mgt."
         JSObjectLine.Add('company', _SH."Sell-to Customer Name");
         JSObjectLine.Add('street1', _SH."Sell-to Address");
         JSObjectLine.Add('street2', _SH."Sell-to Address 2");
-        JSObjectLine.Add('street3', '');
         JSObjectLine.Add('city', _SH."Sell-to City");
         JSObjectLine.Add('state', _SH."Sell-to County");
         JSObjectLine.Add('postalCode', _SH."Sell-to Post Code");
         JSObjectLine.Add('country', _SH."Ship-to Country/Region Code");
         JSObjectLine.Add('phone', _SH."Sell-to Phone No.");
         JSObjectLine.Add('residential', false);
+        exit(JSObjectLine);
+    end;
+
+    local procedure jsonShipFrom(LocationCode: Code[10]): JsonObject
+    var
+        _jsonObject: JsonObject;
+    begin
+        _jsonObject := jsonShipFromFromLocation(LocationCode);
+        if _jsonObject.Contains('name') then
+            exit(_jsonObject)
+        else
+            exit(jsonShipFromFromCompaniInfo());
+    end;
+
+    procedure jsonShipFromFromLocation(LocationCode: Code[10]): JsonObject
+    var
+        JSObjectLine: JsonObject;
+        _Location: Record Location;
+    begin
+        with _Location do begin
+            Get(LocationCode);
+            if Address = '' then exit(JSObjectLine);
+            JSObjectLine.Add('name', Contact);
+            JSObjectLine.Add('company', Name + "Name 2");
+            JSObjectLine.Add('street1', Address);
+            JSObjectLine.Add('street2', "Address 2");
+            JSObjectLine.Add('city', City);
+            JSObjectLine.Add('state', County);
+            JSObjectLine.Add('postalCode', "Post Code");
+            JSObjectLine.Add('country', "Country/Region Code");
+            JSObjectLine.Add('phone', "Phone No.");
+            JSObjectLine.Add('residential', false);
+        end;
         exit(JSObjectLine);
     end;
 
@@ -893,7 +937,6 @@ codeunit 50001 "ShipStation Mgt."
             JSObjectLine.Add('company', "Ship-to Name" + "Ship-to Name 2");
             JSObjectLine.Add('street1', "Ship-to Address");
             JSObjectLine.Add('street2', "Ship-to Address 2");
-            JSObjectLine.Add('street3', '');
             JSObjectLine.Add('city', "Ship-to City");
             JSObjectLine.Add('state', "Ship-to County");
             JSObjectLine.Add('postalCode', "Ship-to Post Code");
