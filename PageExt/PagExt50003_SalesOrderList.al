@@ -118,7 +118,7 @@ pageextension 50003 "Sales Order List Ext." extends "Sales Order List"
                 {
                     ApplicationArea = All;
                     Image = VoidCreditCard;
-                    Visible = "ShipStation Shipment ID" <> '';
+                    // Visible = "ShipStation Shipment ID" <> '';
 
                     trigger OnAction()
                     var
