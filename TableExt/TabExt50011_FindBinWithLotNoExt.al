@@ -4,6 +4,7 @@ tableextension 50100 "Find Bin with Lot No Ext." extends "Put-away Template Line
     {
         field(50100; "Find Same Lot No."; Boolean)
         {
+            DataClassification = ToBeClassified;
             CaptionML = ENU = 'Find Same Lot No.', RUS = 'Найти такую же поставку';
 
             trigger OnValidate()
