@@ -139,7 +139,7 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                         pageShippingRates: Page "Shipping Rates";
                         SSMgt: Codeunit "ShipStation Mgt.";
                     begin
-                        if "ShipStation Order Key" = '' then Error(salesOrderNotRegisterInShipStation, "No.");
+                        // if "ShipStation Order Key" = '' then Error(salesOrderNotRegisterInShipStation, "No.");
                         SSMgt.GetShippingRatesByCarrier(Rec);
                         Commit();
                         pageShippingRates.LookupMode(true);

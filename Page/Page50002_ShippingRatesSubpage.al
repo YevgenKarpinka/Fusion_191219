@@ -1,5 +1,6 @@
 page 50002 "Shipping Rates Subpage"
 {
+    CaptionML = ENU = 'Shipping Rate Lines';
     PageType = ListPart;
     ApplicationArea = All;
     UsageCategory = Administration;

@@ -1185,7 +1185,7 @@ codeunit 50001 "ShipStation Mgt."
                 SetRange("SS Carrier Code", _SSAgentCode);
                 SetRange("SS Code", _SSCode);
                 if FindFirst() then exit(true);
-                InsertServicesFromShipStation(GetCarrierCodeBySSAgentCode(_SSAgentCode), GetLastCarrierServiceCode(), _SSAgentCode, _SSCode,
+                InsertServicesFromShipStation(GetCarrierCodeBySSAgentCode(_SSAgentCode), GetLastCarrierServiceCode(GetCarrierCodeBySSAgentCode(_SSAgentCode)), _SSAgentCode, _SSCode,
                                               CopyStr(GetJSToken(CarrierToken.AsObject(), 'name').AsValue().AsText(), 1, MaxStrLen(ShippingAgentServices.Description)));
             end;
         end;
@@ -1204,14 +1204,14 @@ codeunit 50001 "ShipStation Mgt."
         end;
     end;
 
-    local procedure GetLastCarrierServiceCode(): Code[10]
+    local procedure GetLastCarrierServiceCode(AgentCode: Code[10]): Code[10]
     var
-        _SAS: Record "Shipping Agent Services";
+        locSAS: Record "Shipping Agent Services";
         lblSASCode: Label 'SAS-0001';
         lblSASCodeFilter: Label 'SAS-*';
     begin
-        _SAS.SetFilter(Code, '%1', lblSASCodeFilter);
-        if _SAS.FindLast() then exit(IncStr(_SAS.Code));
+        locSAS.SetRange("Shipping Agent Code", AgentCode);
+        if locSAS.FindLast() then exit(IncStr(locSAS.Code));
         exit(lblSASCode);
     end;
 
@@ -1309,7 +1309,7 @@ codeunit 50001 "ShipStation Mgt."
                 SetRange("SS Code", ServiceCode);
                 if not FindFirst() then
                     // Insert Services
-                    InsertServicesFromShipStation(GetCarrierCodeBySSAgentCode(CarrierCode), GetLastCarrierServiceCode(), CarrierCode, ServiceCode,
+                    InsertServicesFromShipStation(GetCarrierCodeBySSAgentCode(CarrierCode), GetLastCarrierServiceCode(GetCarrierCodeBySSAgentCode(CarrierCode)), CarrierCode, ServiceCode,
                                               CopyStr(GetJSToken(CarrierToken.AsObject(), 'serviceName').AsValue().AsText(), 1, MaxStrLen(_SAS.Description)));
                 "Shipment Cost" := GetJSToken(CarrierToken.AsObject(), 'shipmentCost').AsValue().AsDecimal();
                 "Other Cost" := GetJSToken(CarrierToken.AsObject(), 'otherCost').AsValue().AsDecimal();
@@ -1323,10 +1323,10 @@ codeunit 50001 "ShipStation Mgt."
         Location: Record Location;
         CompanyInfo: Record "Company Information";
     begin
-        CompanyInfo.SetCurrentKey(Name);
-        CompanyInfo.SetRange(Name, CompanyName);
-        if CompanyInfo.FindFirst() then exit(CompanyInfo."Ship-to Post Code");
         if Location.Get(_LocationCode) then exit(Location."Post Code");
+        // CompanyInfo.SetCurrentKey(Name);
+        // CompanyInfo.SetRange(Name, CompanyName);
+        if CompanyInfo.Get() then exit(CompanyInfo."Ship-to Post Code");
     end;
 
     var
