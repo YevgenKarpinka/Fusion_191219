@@ -1,5 +1,9 @@
 codeunit 50003 "Bank Checks Mgt."
 {
+    Permissions = tabledata "General Ledger Setup" = r, tabledata "Bank Check Journal Line" = rimd,
+    tabledata "Gen. Journal Line" = rimd, tabledata "Gen. Journal Template" = r,
+    tabledata "Gen. Journal Batch" = r, tabledata "G/L Entry" = r;
+
     trigger OnRun()
     begin
 

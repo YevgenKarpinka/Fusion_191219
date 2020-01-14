@@ -5,6 +5,7 @@ page 50003 "Bank Checks Journal"
     UsageCategory = Lists;
     SourceTable = "Bank Check Journal Line";
     SourceTableView = where(Status = const(New));
+    AccessByPermission = tabledata "Bank Check Journal Line" = rimd;
 
     layout
     {

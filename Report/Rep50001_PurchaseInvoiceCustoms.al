@@ -5,6 +5,7 @@ report 50001 "Purchase Invoice Customs"
     RDLCLayout = 'Purchase Invoice Customs.rdl';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
+    AccessByPermission = report "Purchase Invoice Customs" = x;
 
     dataset
     {

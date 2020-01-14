@@ -4,6 +4,7 @@ page 50005 "Item Filter Group List"
     ApplicationArea = All;
     UsageCategory = Administration;
     SourceTable = "Item Filter Group";
+    AccessByPermission = tabledata "Item Filter Group" = rimd;
 
     layout
     {

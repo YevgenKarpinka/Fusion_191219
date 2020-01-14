@@ -1,5 +1,17 @@
 codeunit 50001 "ShipStation Mgt."
 {
+    Permissions = tabledata "Source Parameters" = rimd, tabledata "Sales Header" = rimd,
+    tabledata "Sales Line" = r, tabledata "Shipping Agent Services" = rimd,
+    tabledata "Shipping Agent" = rimd, tabledata Customer = r,
+    tabledata Item = r, tabledata Manufacturer = r,
+    tabledata Brand = r, tabledata "Item Filter Group" = r,
+    tabledata "Item Category" = r, tabledata "Sales Price" = r,
+    tabledata "Warehouse Shipment Line" = r, tabledata "Warehouse Shipment Header" = r,
+    tabledata "Tenant Media" = rimd, tabledata "Document Attachment" = rimd,
+    tabledata Contact = r, tabledata Location = r,
+    tabledata "Company Information" = r, tabledata "Item Attribute" = r,
+    tabledata "Item Attribute Value" = r, tabledata "Item Attribute Value Mapping" = r;
+
     trigger OnRun()
     begin
 
@@ -1324,8 +1336,6 @@ codeunit 50001 "ShipStation Mgt."
         CompanyInfo: Record "Company Information";
     begin
         if Location.Get(_LocationCode) then exit(Location."Post Code");
-        // CompanyInfo.SetCurrentKey(Name);
-        // CompanyInfo.SetRange(Name, CompanyName);
         if CompanyInfo.Get() then exit(CompanyInfo."Ship-to Post Code");
     end;
 

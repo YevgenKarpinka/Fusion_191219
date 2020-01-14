@@ -6,6 +6,7 @@ page 50002 "Shipping Rates Subpage"
     UsageCategory = Administration;
     SourceTable = "Shipping Agent Services";
     SourceTableView = where("Shipment Cost" = filter('<>0'));
+    AccessByPermission = tabledata "Shipping Agent Services" = rimd;
 
     InsertAllowed = false;
     DeleteAllowed = false;

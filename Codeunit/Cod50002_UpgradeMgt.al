@@ -1,6 +1,7 @@
 codeunit 50002 "Upgrade Mgt."
 {
     Subtype = Upgrade;
+    Permissions = tabledata "NAV App Setting" = rimd;
 
     trigger OnRun()
     begin

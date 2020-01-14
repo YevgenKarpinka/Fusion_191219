@@ -1,5 +1,9 @@
 codeunit 50006 "IC Extended"
 {
+    Permissions = tabledata "Sales Header" = rimd, tabledata "Sales Line" = rimd,
+    tabledata "Purchase Line" = rimd, tabledata "Purchase Header" = rimd,
+    tabledata "IC Partner" = r, tabledata Vendor = r;
+
     trigger OnRun()
     begin
 

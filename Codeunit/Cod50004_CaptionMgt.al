@@ -1,5 +1,7 @@
 codeunit 50004 "Caption Mgt."
 {
+    Permissions = tabledata "Item Description" = r, tabledata "Tenant Media" = rimd;
+
     procedure GetRecordFiltersWithCaptions(locCust: Record Customer): Text;
     var
         Result: Text;

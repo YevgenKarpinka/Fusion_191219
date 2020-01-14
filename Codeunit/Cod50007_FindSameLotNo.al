@@ -1,5 +1,8 @@
-codeunit 50100 "Find Same Lot No"
+codeunit 50007 "Find Same Lot No"
 {
+    Permissions = tabledata "Posted Whse. Receipt Line" = r, tabledata "Put-away Template Line" = r,
+    tabledata "Bin Content" = rm;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Create Put-away", 'OnFindBinContent', '', true, true)]
     local procedure FindSameLotNo(PostedWhseReceiptLine: Record "Posted Whse. Receipt Line"; PutAwayTemplateLine: Record "Put-away Template Line"; var BinContent: Record "Bin Content")
     begin

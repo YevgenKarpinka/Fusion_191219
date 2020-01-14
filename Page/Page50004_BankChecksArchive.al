@@ -4,6 +4,7 @@ page 50004 "Bank Checks Archive"
     ApplicationArea = All;
     UsageCategory = History;
     SourceTable = "Bank Check Journal Line";
+    AccessByPermission = tabledata "Bank Check Journal Line" = rimd;
     SourceTableView = where(Status = filter(<> New));
     Editable = false;
 

@@ -5,6 +5,7 @@ report 50002 "Sales Order Fusion"
     RDLCLayout = 'Sales Order Fusion.rdl';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
+    AccessByPermission = report "Sales Order Fusion" = x;
 
     dataset
     {

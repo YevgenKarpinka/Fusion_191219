@@ -5,6 +5,7 @@ report 50003 "Sales Invoice Fusion"
     RDLCLayout = 'Sales Invoice Fusion.rdl';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
+    AccessByPermission = report "Sales Invoice Fusion" = x;
 
     dataset
     {

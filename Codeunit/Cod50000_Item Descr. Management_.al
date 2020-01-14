@@ -1,6 +1,8 @@
 codeunit 50000 "Item Descr. Management"
 {
     EventSubscriberInstance = StaticAutomatic;
+    Permissions = tabledata "Config. Package" = rimd, tabledata "Excel Buffer" = rimd,
+    tabledata "Item Description" = rimd;
 
     [EventSubscriber(ObjectType::Table, 370, 'OnBeforeParseCellValue', '', true, true)]
     local procedure ParseCellValue2Blob(var ExcelBuffer: Record "Excel Buffer"; var Value: Text; var FormatString: Text; var isHandled: Boolean)

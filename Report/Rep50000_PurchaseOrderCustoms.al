@@ -5,6 +5,7 @@ report 50000 "Purchase Order Customs"
     RDLCLayout = 'Purchase Order Customs.rdl';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
+    AccessByPermission = report "Purchase Order Customs" = x;
 
     dataset
     {

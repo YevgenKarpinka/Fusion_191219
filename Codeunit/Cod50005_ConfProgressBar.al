@@ -1,5 +1,6 @@
 codeunit 50005 "Config Progress Bar"
 {
+
     trigger OnRun()
     begin
 

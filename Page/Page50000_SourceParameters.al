@@ -5,6 +5,7 @@ page 50000 "Source Parameters"
     UsageCategory = Administration;
     SourceTable = "Source Parameters";
     SourceTableView = sorting(Code) order(descending);
+    AccessByPermission = tabledata "Source Parameters" = rimd;
 
     layout
     {

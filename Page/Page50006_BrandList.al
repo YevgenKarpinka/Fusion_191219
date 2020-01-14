@@ -4,6 +4,7 @@ page 50006 "Brand List"
     ApplicationArea = All;
     UsageCategory = Administration;
     SourceTable = Brand;
+    AccessByPermission = tabledata Brand = rimd;
 
     layout
     {

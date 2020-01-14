@@ -1,5 +1,7 @@
-codeunit 50101 "Upgrade Bin Content"
+codeunit 50008 "Upgrade Bin Content"
 {
+    Permissions = tabledata "Bin Content" = rm, tabledata "Warehouse Entry" = r;
+
     Subtype = Install;
 
     trigger OnInstallAppPerCompany()
