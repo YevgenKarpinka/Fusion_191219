@@ -65,8 +65,6 @@ codeunit 50006 "IC Extended"
             _ICSalesLine.SetFilter(Quantity, '<>%1', 0);
             if _ICSalesLine.FindSet(true, false) then begin
                 _ICSalesLine.AutoReserve();
-                // _ICSalesLine.Validate(Quantity);
-                // _ICSalesLine.Modify();
             end;
         end;
     end;
