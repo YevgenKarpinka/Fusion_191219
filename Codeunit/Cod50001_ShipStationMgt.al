@@ -684,7 +684,7 @@ codeunit 50001 "ShipStation Mgt."
         _SH.Modify();
     end;
 
-    local procedure FindWarehouseSipment(_DocNo: Code[20]; var _WhseShipDcoNo: Code[20]): Boolean
+    procedure FindWarehouseSipment(_DocNo: Code[20]; var _WhseShipDcoNo: Code[20]): Boolean
     var
         WhseShipLine: Record "Warehouse Shipment Line";
     begin

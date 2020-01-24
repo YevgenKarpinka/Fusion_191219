@@ -9,6 +9,158 @@ codeunit 50006 "IC Extended"
 
     end;
 
+    [EventSubscriber(ObjectType::Table, 36, 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure CheckExistICSalesOrderBeforeManualDelete(var Rec: Record "Sales Header"; RunTrigger: Boolean)
+    var
+        _ICPartner: Record "IC Partner";
+        _PurchHeader: Record "Purchase Header";
+    begin
+        with Rec do begin
+            if "External Document No." <> '' then begin
+                _ICPartner.SetCurrentKey("Customer No.");
+                _ICPartner.SetRange("Customer No.", "Sell-to Customer No.");
+                if _ICPartner.FindFirst() then begin
+                    _PurchHeader.ChangeCompany(_ICPartner."Inbox Details");
+                    if _PurchHeader.Get(_PurchHeader."Document Type"::Order, "External Document No.") then
+                        Error(errDeleteICSalesOrder, "No.", "External Document No.");
+                end;
+            end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, 38, 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure CheckExistICPurchaseOrderBeforeManualDelete(var Rec: Record "Purchase Header"; RunTrigger: Boolean)
+    begin
+        with Rec do begin
+            if "IC Document No." <> '' then
+                Error(errDeletePurchOrder, "No.", "IC Document No.");
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnBeforeReopenSalesDoc', '', false, false)]
+    local procedure CheckPOCreated(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean)
+    var
+        _PurchaseOrderNo: Code[20];
+        _PostedPurchaseInvoceNo: code[20];
+        _ICSalesOrderNo: Code[20];
+        _PostedICSalesInvoiceNo: Code[20];
+    begin
+        FoundPurchaseOrder(SalesHeader."No.", _PurchaseOrderNo, _PostedPurchaseInvoceNo);
+        if _PostedPurchaseInvoceNo <> '' then
+            Error(errPurchOrderPosted, SalesHeader."No.", _PostedPurchaseInvoceNo);
+
+        if _PurchaseOrderNo <> '' then
+            FoundICSalesOrder(_PurchaseOrderNo, _ICSalesOrderNo, _PostedICSalesInvoiceNo);
+
+        if _PostedICSalesInvoiceNo <> '' then
+            Error(errICSalesOrderPosted, SalesHeader."No.", _PostedICSalesInvoiceNo);
+
+        DeleteICSalesOrderAndPurchaseOrder(SalesHeader."No.", _PurchaseOrderNo);
+    end;
+
+    local procedure DeleteICSalesOrderAndPurchaseOrder(_SalesHeaderNo: Code[20]; _PurchaseOrderNo: Code[20]);
+    var
+        _PurchHeader: Record "Purchase Header";
+        _PurchHeaderForDelete: Record "Purchase Header";
+        _Vend: Record Vendor;
+        _ICPartner: Record "IC Partner";
+        _ICSalesHeader: Record "Sales Header";
+        _ICSalesHeaderForDelete: Record "Sales Header";
+    begin
+
+        if _PurchaseOrderNo <> '' then begin
+            _PurchHeader.Get(_PurchHeader."Document Type"::Order, _PurchaseOrderNo);
+            _Vend.Get(_PurchHeader."Buy-from Vendor No.");
+            _ICPartner.Get(_Vend."IC Partner Code");
+            with _ICSalesHeader do begin
+                ChangeCompany(_ICPartner."Inbox Details");
+                SetCurrentKey("External Document No.");
+                SetRange("External Document No.", _PurchaseOrderNo);
+                if FindSet(false, false) then
+                    repeat
+                        _ICSalesHeaderForDelete.Get("Document Type"::Order, "No.");
+                        _ICSalesHeaderForDelete."External Document No." := '';
+                        _ICSalesHeaderForDelete.Modify();
+                        _ICSalesHeaderForDelete.Delete(true);
+                    until Next() = 0;
+            end;
+        end;
+
+        with _PurchHeader do begin
+            SetCurrentKey("IC Document No.");
+            SetRange("IC Document No.", _SalesHeaderNo);
+            if FindSet(false, false) then
+                repeat
+                    _PurchHeaderForDelete.Get("Document Type"::Order, "No.");
+                    _PurchHeaderForDelete."IC Document No." := '';
+                    _PurchHeaderForDelete.Modify();
+                    _PurchHeaderForDelete.Delete(true);
+                until Next() = 0;
+        end;
+    end;
+
+    local procedure FoundICSalesOrder(purchaseOrderNo: Code[20]; var _ICSalesOrderNo: Code[20]; var _PostedICSalesInvoiceNo: Code[20])
+    var
+        _PurchHeader: Record "Purchase Header";
+        _Vend: Record Vendor;
+        _ICPartner: Record "IC Partner";
+        _ICSalesHeader: Record "Sales Header";
+        _ICSalesInvHeader: Record "Sales Invoice Header";
+        _WhseShipLine: Record "Warehouse Shipment Line";
+        _PostedWhseShipLine: Record "Posted Whse. Shipment Line";
+    begin
+        _ICSalesOrderNo := '';
+        _PostedICSalesInvoiceNo := '';
+
+        _PurchHeader.Get(_PurchHeader."Document Type"::Order, purchaseOrderNo);
+        _Vend.Get(_PurchHeader."Buy-from Vendor No.");
+        _ICPartner.Get(_Vend."IC Partner Code");
+
+        with _ICSalesHeader do begin
+            ChangeCompany(_ICPartner."Inbox Details");
+            SetCurrentKey("External Document No.");
+            SetRange("External Document No.", purchaseOrderNo);
+            if FindFirst() then begin
+                _ICSalesOrderNo := "No.";
+                exit;
+            end;
+        end;
+
+        with _ICSalesInvHeader do begin
+            ChangeCompany(_ICPartner."Inbox Details");
+            SetCurrentKey("External Document No.");
+            SetRange("External Document No.", purchaseOrderNo);
+            if FindFirst() then
+                _PostedICSalesInvoiceNo := "No.";
+
+        end;
+
+    end;
+
+    local procedure FoundPurchaseOrder(salesOrderNo: Code[20]; var _PurchaseOrderNo: Code[20]; var _PostedPurchaseInvoiceNo: Code[20])
+    var
+        _PurchHeader: Record "Purchase Header";
+        _PurchInvHeader: Record "Purch. Inv. Header";
+    begin
+        _PurchaseOrderNo := '';
+        _PostedPurchaseInvoiceNo := '';
+
+        with _PurchHeader do begin
+            SetCurrentKey("IC Document No.");
+            SetRange("IC Document No.", salesOrderNo);
+            if FindFirst() then begin
+                _PurchaseOrderNo := "No.";
+                exit;
+            end;
+        end;
+        with _PurchInvHeader do begin
+            SetCurrentKey("IC Document No.");
+            SetRange("IC Document No.", salesOrderNo);
+            if FindFirst() then
+                _PostedPurchaseInvoiceNo := "No.";
+        end;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnAfterReleaseSalesDoc', '', false, false)]
     local procedure CreatePOFromSO(var SalesHeader: Record "Sales Header")
     var
@@ -128,4 +280,16 @@ codeunit 50006 "IC Extended"
         CopyDocumentMgt: Codeunit "Copy Document Mgt.";
         ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+        errPurchOrderPosted: TextConst ENU = 'Reopen Sales Order = %1 not allowed!\Purchase Order = %2 Posted!',
+                                        RUS = 'Открыть Заказ Продажи = %1 нельзя!\Заказ Покупки = %2 учтен!';
+        errICSalesOrderPosted: TextConst ENU = 'Reopen Sales Order = %1 not allowed!\Intercompany Sales Order = %2 Posted!',
+                                            RUS = 'Открыть Заказ Продажи = %1 нельзя!\Межфирменный Заказ Продажи = %2 учтен!';
+        errDeletePurchOrder: TextConst ENU = 'Delete Purchase Order = %1 not allowed!\Delete Sales Order = %2 first!',
+                                        RUS = 'Удалить Заказ Покупки = %1 нельзя!\Первым удалите Заказ Продажи = %2!';
+        errDeleteICSalesOrder: TextConst ENU = 'Delete Intercompany Sales Order = %1 not allowed!\Delete Purchase Order = %2 first!',
+                                        RUS = 'Удалить Межфирменный Заказ Продажи = %1 нельзя!\Первым удалите Заказ Покупки = %2!';
+        errWhseShipmentExist: TextConst ENU = 'Delete Intercompany Sales Order = %1 not allowed!\Warehouse Shipment = %2 exist!',
+                                        RUS = 'Удалить Межфирменный Заказ Продажи = %1 нельзя!\Удалите Складскую отгрузку = %2!';
+        errPostedWhseShipmentExist: TextConst ENU = 'Delete Intercompany Sales Order = %1 not allowed!\Posted Warehouse Shipment = %2 exist!',
+                                        RUS = 'Удалить Межфирменный Заказ Продажи = %1 нельзя!\Удалите Складскую отгрузку = %2!';
 }
