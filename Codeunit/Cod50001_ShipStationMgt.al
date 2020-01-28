@@ -605,12 +605,11 @@ codeunit 50001 "ShipStation Mgt."
         txtLabel: Text;
         txtBeforeName: Text;
         WhseShipDocNo: Code[20];
-        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Existed!';
         errorShipStationOrderNotExist: TextConst ENU = 'ShipStation Order is not Existed!';
     begin
         if (DocNo = '') or (not _SH.Get(_SH."Document Type"::Order, DocNo)) or (_SH."ShipStation Order ID" = '') then Error(errorShipStationOrderNotExist);
         // comment to test Create Label and Attache to Warehouse Shipment
-        if not FindWarehouseSipment(DocNo, WhseShipDocNo) then Error(errorWhseShipNotExist);
+        if not FindWarehouseSipment(DocNo, WhseShipDocNo) then Error(errorWhseShipNotExist, DocNo);
 
         // Get Order from Shipstation to Fill Variables
         JSText := Connect2ShipStation(1, '', StrSubstNo('/%1', _SH."ShipStation Order ID"));
@@ -651,7 +650,6 @@ codeunit 50001 "ShipStation Mgt."
         JSText: Text;
         JSObject: JsonObject;
         WhseShipDocNo: Code[20];
-        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Existed!';
     begin
         if (DocNo = '') or (not _SH.Get(_SH."Document Type"::Order, DocNo)) or (_SH."ShipStation Shipment ID" = '') then exit(false);
 
@@ -666,7 +664,7 @@ codeunit 50001 "ShipStation Mgt."
         JSObject.ReadFrom(JSText);
         UpdateSalesHeaderFromShipStation(_SH."No.", JSObject);
 
-        if not FindWarehouseSipment(DocNo, WhseShipDocNo) then Error(errorWhseShipNotExist);
+        if not FindWarehouseSipment(DocNo, WhseShipDocNo) then Error(errorWhseShipNotExist, DocNo);
         DeleteAttachment(WhseShipDocNo);
     end;
 
@@ -1346,5 +1344,6 @@ codeunit 50001 "ShipStation Mgt."
         errTotalGrossWeightIsZero: TextConst ENU = 'Total Gross Weight Order = %1\But Must Be > 0', RUS = 'Общий Брутто вес Заказа = %1\Должен быть > 0';
         lblAwaitingShipment: Label 'awaiting_shipment';
         confUpdateCarriersList: TextConst ENU = 'Update the list %1?', RUS = 'Обновить список %1?';
+        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Created for Sales Order = %1!', RUS = 'Для Заказа продажи = %1 не создана Складская отгрузка!';
         globalToken: Text;
 }

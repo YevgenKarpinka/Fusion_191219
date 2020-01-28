@@ -98,6 +98,24 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                 end;
             }
         }
+        addafter(IncomingDocument)
+        {
+            action("Delete IC Sales and Purchase Orders")
+            {
+                ApplicationArea = All;
+                Image = DeleteAllBreakpoints;
+                CaptionML = ENU = 'Delete IC Sales and Purchase Orders', RUS = 'Удалить МФ Заказы Продажи и Покупки';
+
+                trigger OnAction()
+                var
+                    _SalesHeader: Record "Sales Header";
+                    _ICExtended: Codeunit "IC Extended";
+                begin
+                    _SalesHeader := Rec;
+                    _ICExtended.DeletePurchOrderAndICSalesOrder(_SalesHeader);
+                end;
+            }
+        }
         addbefore("F&unctions")
         {
             group(actionShipStation)
