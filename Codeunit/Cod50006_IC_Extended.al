@@ -252,9 +252,62 @@ codeunit 50006 "IC Extended"
         //     SetRange("Document Type", "Document Type"::Order);
         //     if IsEmpty then
         FoundPurchaseOrder(SalesHeader."No.", _PurchaseOrderNo, _PostedPurchaseInvoceNo);
-        if (_PurchaseOrderNo = '') and (_PostedPurchaseInvoceNo = '') then
+        if (_PurchaseOrderNo = '') and (_PostedPurchaseInvoceNo = '') then begin
             CreateICPurchaseOrder(SalesHeader);
+            CreateDeliverySalesLine(SalesHeader."No.", SalesHeader."Sell-to Customer No.");
+        end;
         // end;
+    end;
+
+    procedure CreateDeliverySalesLine(_salesHeaderNo: Code[20]; _customerNo: Code[20])
+    var
+        _salesHeader: Record "Sales Header";
+        _salesLine: Record "Sales Line";
+        _salesLineLast: Record "Sales Line";
+        _customer: Record Customer;
+        LineNo: Integer;
+        UpdatedStatus: Boolean;
+    begin
+        if (not _customer.Get(_customerNo))
+            // or (_customer."Sales No. Shipment Cost" = '')
+            or (not _salesHeader.Get(_salesHeader."Document Type"::Order, _salesHeaderNo))
+            or (_salesHeader."ShipStation Shipment Amount" = 0) then
+            exit;
+
+        with _salesLineLast do begin
+            SetRange("Document Type", "Document Type"::Order);
+            SetRange("Document No.", _salesHeaderNo);
+            if FindLast() then
+                LineNo := "Line No." + 10000
+            else
+                LineNo := 10000;
+        end;
+
+        with _salesHeader do
+            if Status = Status::Released then begin
+                Status := Status::Open;
+                Modify();
+                UpdatedStatus := true;
+            end;
+
+        with _salesLine do begin
+            Init;
+            "Document Type" := "Document Type"::Order;
+            "Document No." := _salesHeaderNo;
+            "Line No." := LineNo;
+            Insert(true);
+            Validate(Type, _customer."Posting Type Shipment Cost");
+            Validate("No.", _customer."Sales No. Shipment Cost");
+            Validate(Quantity, 1);
+            Validate("Unit Price", _salesHeader."ShipStation Shipment Amount");
+            Modify(true)
+        end;
+
+        if UpdatedStatus then
+            with _salesHeader do begin
+                Status := Status::Released;
+                Modify();
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnAfterTransfldsFromSalesToPurchLine', '', false, false)]

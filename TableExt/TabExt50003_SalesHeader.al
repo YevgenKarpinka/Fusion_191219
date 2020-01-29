@@ -92,6 +92,7 @@ tableextension 50003 "Sales Header Ext." extends "Sales Header"
         "Shipping Agent Service Code" := SAS.Code;
         "ShipStation Shipment Cost" := SAS."Shipment Cost";
         "ShipStation Insurance Cost" := SAS."Other Cost";
+        "ShipStation Shipment Amount" := "ShipStation Shipment Cost" + "ShipStation Insurance Cost";
         Modify(true);
     end;
 }

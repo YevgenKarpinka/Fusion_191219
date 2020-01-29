@@ -10,7 +10,7 @@ page 50010 "APIV2 - Sales Orders"
     EntitySetName = 'salesOrders';
     ODataKeyFields = Id;
     PageType = API;
-    SourceTable = 5495;
+    SourceTable = "Sales Order Entity Buffer";
     Extensible = false;
 
     layout
@@ -64,6 +64,7 @@ page 50010 "APIV2 - Sales Orders"
                         RegisterFieldSet(FIELDNO("Document Date"));
                     end;
                 }
+                // >>
                 field(shipstationShippingAmount; "ShipStation Shipment Amount")
                 {
                     ApplicationArea = All;
@@ -74,6 +75,7 @@ page 50010 "APIV2 - Sales Orders"
                         RegisterFieldSet(FIELDNO("ShipStation Shipment Amount"));
                     end;
                 }
+                // <<
                 field(customerId; "Customer Id")
                 {
                     ApplicationArea = All;
