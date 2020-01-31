@@ -189,6 +189,14 @@ table 50000 "Item Description"
         {
             DataClassification = ToBeClassified;
         }
+        field(42; "Name ENG"; Text[100])
+        {
+            DataClassification = ToBeClassified;
+        }
+        field(43; "Name ENG 2"; Text[50])
+        {
+            DataClassification = ToBeClassified;
+        }
     }
     keys
     {

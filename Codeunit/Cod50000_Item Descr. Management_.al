@@ -242,6 +242,8 @@ codeunit 50000 "Item Descr. Management"
             Evaluate(ItemDescr."Serving Size", GetValueAtCell(RowNo, 39));
             Evaluate(ItemDescr."Servings per container", GetValueAtCell(RowNo, 40));
             ItemDescr.SetTextToBlobField(ItemDescr.FieldNo("Legal Disclaimer"), GetValueAtCell(RowNo, 41));
+            ItemDescr."Name ENG" := GetValueAtCell(RowNo, 42);
+            ItemDescr."Name ENG 2" := GetValueAtCell(RowNo, 43);
 
             ItemDescr.Modify();
 

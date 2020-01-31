@@ -46,6 +46,26 @@ pageextension 50001 "Item Card Ext." extends "Item Card"
                         ItemDescriptionModify;
                     end;
                 }
+                field("Name ENG"; ItemDescription."Name ENG")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnValidate()
+                    begin
+                        if not ItemDescriptionExist then ItemDescription.InitItemDescription("No.");
+                        ItemDescriptionModify;
+                    end;
+                }
+                field("Name ENG 2"; ItemDescription."Name ENG 2")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnValidate()
+                    begin
+                        if not ItemDescriptionExist then ItemDescription.InitItemDescription("No.");
+                        ItemDescriptionModify;
+                    end;
+                }
                 group(groupDescription)
                 {
                     CaptionML = ENU = 'Description';

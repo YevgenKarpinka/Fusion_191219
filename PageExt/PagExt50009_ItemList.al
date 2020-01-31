@@ -31,7 +31,7 @@ pageextension 50009 "Item List Ext." extends "Item List"
                     trigger OnAction()
                     var
                         ItemFilterGroupMgt: Codeunit "Item Filter Group Mgt.";
-                        TempItemFilterGroup: Record "Item Filter Group" temporary;
+                        ItemFilterGroup: Record "Item Filter Group";
                         TempItemFilteredByGroup: Record Item temporary;
                         TypeHelper: Codeunit "Type Helper";
                         CloseAction: Action;
@@ -39,11 +39,13 @@ pageextension 50009 "Item List Ext." extends "Item List"
                         FilterPageID: Integer;
                         ParameterCount: Integer;
                     begin
-                        FilterPageID := Page::"Item Filter Group List";
-                        CloseAction := Page.RunModal(FilterPageID, TempItemFilterGroup);
+                        // ItemFilterGroupMgt.FillTempItemFilterGroup(TempItemFilterGroup);
+
+                        FilterPageID := Page::"Item Filter By Group";
+                        CloseAction := Page.RunModal(FilterPageID, ItemFilterGroup);
                         if (CloseAction <> Action::LookupOK) then exit;
 
-                        if TempItemFilterGroup.IsEmpty then begin
+                        if ItemFilterGroup.IsEmpty then begin
                             FilterGroup(0);
                             SetRange("No.");
                             exit;
@@ -51,7 +53,7 @@ pageextension 50009 "Item List Ext." extends "Item List"
 
                         TempItemFilteredByGroup.RESET;
                         TempItemFilteredByGroup.DELETEALL;
-                        ItemFilterGroupMgt.GetFilteredItems(TempItemFilterGroup, TempItemFilteredByGroup);
+                        ItemFilterGroupMgt.GetFilteredItems(ItemFilterGroup, TempItemFilteredByGroup);
                         FilterText := ItemFilterGroupMgt.GetItemNoFilter(TempItemFilteredByGroup, ParameterCount);
 
                         if ParameterCount < TypeHelper.GetMaxNumberOfParametersInSQLQuery - 100 then begin
@@ -60,8 +62,8 @@ pageextension 50009 "Item List Ext." extends "Item List"
                             SetFilter("No.", FilterText);
                         end else begin
                             // RunOnTempRec := TRUE;
-                            ClearMarks();
-                            Reset();
+                            // ClearMarks();
+                            // Reset();
                         end;
                     end;
                 }

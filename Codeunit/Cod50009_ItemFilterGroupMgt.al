@@ -5,6 +5,20 @@ codeunit 50009 "Item Filter Group Mgt."
 
     end;
 
+    procedure FillTempItemFilterGroup(var TempItemFilterGroup: Record "Item Filter Group" temporary)
+    var
+        _itemFilterGroup: Record "Item Filter Group";
+    begin
+        with _itemFilterGroup do begin
+            FindFirst();
+            repeat
+                TempItemFilterGroup.TransferFields(_itemFilterGroup);
+                TempItemFilterGroup.Insert();
+            until Next() = 0;
+            TempItemFilterGroup.FindFirst();
+        end;
+    end;
+
     procedure GetItemNoFilter(TempFilteredItem: Record Item temporary; var ParameterCount: Integer) ItemNoFilter: Text
     var
     begin

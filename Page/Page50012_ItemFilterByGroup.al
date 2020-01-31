@@ -1,10 +1,11 @@
-page 50005 "Item Filter Group List"
+page 50012 "Item Filter By Group"
 {
     PageType = List;
     ApplicationArea = All;
     UsageCategory = Administration;
     SourceTable = "Item Filter Group";
     AccessByPermission = tabledata "Item Filter Group" = rimd;
+    // Editable = false;
 
     layout
     {
