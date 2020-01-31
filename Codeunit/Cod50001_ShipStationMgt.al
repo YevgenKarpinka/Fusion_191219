@@ -17,6 +17,69 @@ codeunit 50001 "ShipStation Mgt."
 
     end;
 
+    procedure SentOrderShipmentStatusForWooComerse(_salesOrderNo: Code[20])
+    var
+        // _Item: Record Item;
+        // _ItemModify: Record Item;
+        // _jsonItemList: JsonArray;
+        // _jsonErrorItemList: JsonArray;
+        _jsonOrderShipmentStatus: JsonObject;
+        _jsonToken: JsonToken;
+        _jsonText: Text;
+        // TotalCount: Integer;
+        // Counter: Integer;
+        // msgClearTransferFlag: TextConst ENU = 'Clear Transfer Flag?', RUS = 'Очистить признак передачи?';
+        responseText: Text;
+        IsSuccessStatusCode: Boolean;
+        _captionMgt: Codeunit "Caption Mgt.";
+    begin
+        _jsonOrderShipmentStatus := CreateJsonOrderShipmentStatusForWooComerse(_salesOrderNo);
+        if not _jsonOrderShipmentStatus.Get('id', _jsonToken) then exit;
+        _jsonOrderShipmentStatus.WriteTo(_jsonText);
+
+        IsSuccessStatusCode := true;
+        Connector2eShop(_jsonText, IsSuccessStatusCode, responseText, 'SENTDELIVERYSTATUS2ESHOP');
+        if not IsSuccessStatusCode then begin
+            _captionMgt.SaveStreamToFile(responseText, 'errorItemList.txt');
+        end;
+    end;
+
+    local procedure CreateJsonOrderShipmentStatusForWooComerse(_salesOrderNo: Code[20]): JsonObject
+    var
+        _salerHeader: Record "Sales Header";
+        _jsonObject: JsonObject;
+        _jsonNullArray: JsonArray;
+        _iCExtended: Codeunit "IC Extended";
+        _orderNo: Code[20];
+        _postedOrderNo: Code[20];
+    begin
+        _iCExtended.FoundPurchaseOrder(_salesOrderNo, _orderNo, _postedOrderNo);
+        if (_orderNo = '') and (_postedOrderNo = '') then begin
+            _jsonObject.Add('id', _salesOrderNo);
+            _jsonObject.Add('status', _shippedStatus);
+            _jsonObject.Add('trackId', _jsonTrackId(_salesOrderNo));
+        end else begin
+            _iCExtended.FoundParentICSalesOrder(_salesOrderNo, _orderNo);
+            if _orderNo <> '' then begin
+                _jsonObject.Add('id', _salesOrderNo);
+                _jsonObject.Add('status', _shippedStatus);
+                _jsonObject.Add('trackId', _jsonNullArray);
+            end;
+        end;
+
+        exit(_jsonObject);
+    end;
+
+    local procedure _jsonTrackId(_salesOrderNo: Code[20]): JsonArray
+    var
+        _salerHeader: Record "Sales Header";
+        _jsonArray: JsonArray;
+    begin
+        if _salerHeader.Get(_salerHeader."Document Type"::Order, _salesOrderNo) then
+            _jsonArray.Add(_salerHeader."Package Tracking No.");
+        exit(_jsonArray);
+    end;
+
     procedure SetTestMode(_testMode: Boolean)
     begin
         testMode := _testMode;
@@ -59,7 +122,7 @@ codeunit 50001 "ShipStation Mgt."
         exit(responseText);
     end;
 
-    procedure AddProduct2eShop(Body2Request: Text; var IsSuccessStatusCode: Boolean; var responseText: Text)
+    procedure Connector2eShop(Body2Request: Text; var IsSuccessStatusCode: Boolean; var responseText: Text; SPCode: Code[20])
     begin
         if globalToken = '' then
             globalToken := DelChr(Connect2eShop('LOGIN2ESHOP', '', '', IsSuccessStatusCode), '<>', '"');
@@ -67,7 +130,8 @@ codeunit 50001 "ShipStation Mgt."
             responseText := globalToken;
             exit;
         end;
-        responseText := Connect2eShop('ADDPRODUCT2ESHOP', Body2Request, globalToken, IsSuccessStatusCode);
+        // responseText := Connect2eShop('ADDPRODUCT2ESHOP', Body2Request, globalToken, IsSuccessStatusCode);
+        responseText := Connect2eShop(SPCode, Body2Request, globalToken, IsSuccessStatusCode);
     end;
 
     procedure Connect2ShipStation(SPCode: Integer; Body2Request: Text; newURL: Text): Text
@@ -1345,5 +1409,6 @@ codeunit 50001 "ShipStation Mgt."
         lblAwaitingShipment: Label 'awaiting_shipment';
         confUpdateCarriersList: TextConst ENU = 'Update the list %1?', RUS = 'Обновить список %1?';
         errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Created for Sales Order = %1!', RUS = 'Для Заказа продажи = %1 не создана Складская отгрузка!';
+        _shippedStatus: TextConst ENU = 'Shipped', RUS = 'Отгружен';
         globalToken: Text;
 }

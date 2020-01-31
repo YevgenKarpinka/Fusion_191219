@@ -3,7 +3,6 @@ tableextension 50003 "Sales Header Ext." extends "Sales Header"
 
     fields
     {
-
         // Add changes to table fields here
         field(50000; "ShipStation Order ID"; Text[20])
         {
@@ -51,7 +50,6 @@ tableextension 50003 "Sales Header Ext." extends "Sales Header"
         {
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'ShipStation Shipment Amount', RUS = 'Сума отгрузки ShipStation';
-            Editable = false;
         }
         field(50008; "IC Document No."; Code[20])
         {

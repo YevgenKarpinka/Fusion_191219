@@ -22,6 +22,62 @@ pageextension 50009 "Item List Ext." extends "Item List"
                 CaptionML = ENU = 'eCommerce', RUS = 'eCommerce';
                 Image = SuggestCustomerPayments;
 
+                action(FilterByGroup)
+                {
+                    ApplicationArea = All;
+                    CaptionML = ENU = 'Filter By Group', RUS = 'Фильтр по группам';
+                    Image = FilterLines;
+
+                    trigger OnAction()
+                    var
+                        ItemFilterGroupMgt: Codeunit "Item Filter Group Mgt.";
+                        TempItemFilterGroup: Record "Item Filter Group" temporary;
+                        TempItemFilteredByGroup: Record Item temporary;
+                        TypeHelper: Codeunit "Type Helper";
+                        CloseAction: Action;
+                        FilterText: Text;
+                        FilterPageID: Integer;
+                        ParameterCount: Integer;
+                    begin
+                        FilterPageID := Page::"Item Filter Group List";
+                        CloseAction := Page.RunModal(FilterPageID, TempItemFilterGroup);
+                        if (CloseAction <> Action::LookupOK) then exit;
+
+                        if TempItemFilterGroup.IsEmpty then begin
+                            FilterGroup(0);
+                            SetRange("No.");
+                            exit;
+                        end;
+
+                        TempItemFilteredByGroup.RESET;
+                        TempItemFilteredByGroup.DELETEALL;
+                        ItemFilterGroupMgt.GetFilteredItems(TempItemFilterGroup, TempItemFilteredByGroup);
+                        FilterText := ItemFilterGroupMgt.GetItemNoFilter(TempItemFilteredByGroup, ParameterCount);
+
+                        if ParameterCount < TypeHelper.GetMaxNumberOfParametersInSQLQuery - 100 then begin
+                            FilterGroup(0);
+                            MarkedOnly(false);
+                            SetFilter("No.", FilterText);
+                        end else begin
+                            // RunOnTempRec := TRUE;
+                            ClearMarks();
+                            Reset();
+                        end;
+                    end;
+                }
+                action(ClearGroupFilter)
+                {
+                    ApplicationArea = All;
+                    CaptionML = ENU = 'Clear Group Filter', RUS = 'Очистить фильтр по группам';
+                    Image = ClearFilter;
+
+                    trigger OnAction()
+                    var
+                    begin
+                        FilterGroup(0);
+                        SetRange("No.");
+                    end;
+                }
                 action(Send)
                 {
                     ApplicationArea = All;
@@ -60,7 +116,7 @@ pageextension 50009 "Item List Ext." extends "Item List"
                                         _jsonItemList.WriteTo(_jsonText);
 
                                         IsSuccessStatusCode := true;
-                                        ShipStationMgt.AddProduct2eShop(_jsonText, IsSuccessStatusCode, responseText);
+                                        ShipStationMgt.Connector2eShop(_jsonText, IsSuccessStatusCode, responseText, 'ADDPRODUCT2ESHOP');
                                         if not IsSuccessStatusCode then begin
                                             _jsonErrorItemList.Add(_jsonItem);
                                             _jsonItem.ReadFrom(responseText);
@@ -128,7 +184,7 @@ pageextension 50009 "Item List Ext." extends "Item List"
                                         _jsonItemList.WriteTo(_jsonText);
 
                                         IsSuccessStatusCode := true;
-                                        ShipStationMgt.AddProduct2eShop(_jsonText, IsSuccessStatusCode, responseText);
+                                        ShipStationMgt.Connector2eShop(_jsonText, IsSuccessStatusCode, responseText, 'ADDPRODUCT2ESHOP');
                                         if not IsSuccessStatusCode then begin
                                             _jsonErrorItemList.Add(_jsonItem);
                                             _jsonItem.ReadFrom(responseText);

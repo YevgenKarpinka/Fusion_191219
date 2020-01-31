@@ -129,28 +129,25 @@ codeunit 50006 "IC Extended"
     var
         _PurchHeader: Record "Purchase Header";
         _PurchHeaderForDelete: Record "Purchase Header";
-        _Vend: Record Vendor;
         _ICPartner: Record "IC Partner";
         _ICSalesHeader: Record "Sales Header";
         _ICSalesHeaderForDelete: Record "Sales Header";
     begin
-        if _PurchaseOrderNo <> '' then begin
-            if _PurchHeader.Get(_PurchHeader."Document Type"::Order, _PurchaseOrderNo) then begin
-                _Vend.Get(_PurchHeader."Buy-from Vendor No.");
-                _ICPartner.Get(_Vend."IC Partner Code");
-                with _ICSalesHeader do begin
-                    ChangeCompany(_ICPartner."Inbox Details");
-                    SetCurrentKey("External Document No.");
-                    SetRange("External Document No.", _PurchaseOrderNo);
-                    if FindSet(false, false) then
-                        repeat
-                            _ICSalesHeaderForDelete.ChangeCompany(_ICPartner."Inbox Details");
-                            _ICSalesHeaderForDelete.Get("Document Type"::Order, "No.");
-                            _ICSalesHeaderForDelete."External Document No." := '';
-                            _ICSalesHeaderForDelete.Modify();
-                            _ICSalesHeaderForDelete.Delete(true);
-                        until Next() = 0;
-                end;
+        if (_PurchaseOrderNo <> '')
+            and _PurchHeader.Get(_PurchHeader."Document Type"::Order, _PurchaseOrderNo)
+                and _ICPartner.Get(_PurchHeader."Buy-from IC Partner Code") then begin
+            with _ICSalesHeader do begin
+                ChangeCompany(_ICPartner."Inbox Details");
+                SetCurrentKey("External Document No.");
+                SetRange("External Document No.", _PurchaseOrderNo);
+                if FindSet(false, false) then
+                    repeat
+                        _ICSalesHeaderForDelete.ChangeCompany(_ICPartner."Inbox Details");
+                        _ICSalesHeaderForDelete.Get("Document Type"::Order, "No.");
+                        _ICSalesHeaderForDelete."External Document No." := '';
+                        _ICSalesHeaderForDelete.Modify();
+                        _ICSalesHeaderForDelete.Delete(true);
+                    until Next() = 0;
             end;
         end;
 
@@ -168,22 +165,19 @@ codeunit 50006 "IC Extended"
         end;
     end;
 
-    local procedure FoundICSalesOrder(purchaseOrderNo: Code[20]; var _ICSalesOrderNo: Code[20]; var _PostedICSalesInvoiceNo: Code[20])
+    procedure FoundICSalesOrder(purchaseOrderNo: Code[20]; var _ICSalesOrderNo: Code[20]; var _PostedICSalesInvoiceNo: Code[20])
     var
         _PurchHeader: Record "Purchase Header";
-        _Vend: Record Vendor;
         _ICPartner: Record "IC Partner";
         _ICSalesHeader: Record "Sales Header";
         _ICSalesInvHeader: Record "Sales Invoice Header";
-        _WhseShipLine: Record "Warehouse Shipment Line";
-        _PostedWhseShipLine: Record "Posted Whse. Shipment Line";
     begin
         _ICSalesOrderNo := '';
         _PostedICSalesInvoiceNo := '';
 
-        if _PurchHeader.Get(_PurchHeader."Document Type"::Order, purchaseOrderNo) then begin
-            _Vend.Get(_PurchHeader."Buy-from Vendor No.");
-            _ICPartner.Get(_Vend."IC Partner Code");
+        if (purchaseOrderNo <> '')
+            and _PurchHeader.Get(_PurchHeader."Document Type"::Order, purchaseOrderNo)
+            and _ICPartner.Get(_PurchHeader."Buy-from IC Partner Code") then begin
 
             with _ICSalesHeader do begin
                 ChangeCompany(_ICPartner."Inbox Details");
@@ -207,7 +201,36 @@ codeunit 50006 "IC Extended"
 
     end;
 
-    local procedure FoundPurchaseOrder(salesOrderNo: Code[20]; var _PurchaseOrderNo: Code[20]; var _PostedPurchaseInvoiceNo: Code[20])
+    procedure FoundParentICSalesOrder(_salesOrderNo: Code[20]; var _ICSalesOrderNo: Code[20])
+    var
+        _salesHeader: Record "Sales Header";
+        _ICPartner: Record "IC Partner";
+        _ICPurchaseHeader: Record "Purchase Header";
+        _ICPurchaseInvHeader: Record "Purch. Inv. Header";
+    begin
+        _ICSalesOrderNo := '';
+
+        if _salesHeader.Get(_salesHeader."Document Type"::Order, _salesOrderNo)
+            and _ICPartner.Get(_salesHeader."Sell-to IC Partner Code") then begin
+
+            with _ICPurchaseHeader do begin
+                ChangeCompany(_ICPartner."Inbox Details");
+                if get("Document Type"::Order, _salesHeader."External Document No.") then
+                    _ICSalesOrderNo := "IC Document No.";
+                exit;
+            end;
+        end;
+
+        with _ICPurchaseInvHeader do begin
+            ChangeCompany(_ICPartner."Inbox Details");
+            SetCurrentKey("Order No.");
+            SetRange("Order No.", _salesOrderNo);
+            if FindFirst() then
+                _ICSalesOrderNo := "IC Document No.";
+        end;
+    end;
+
+    procedure FoundPurchaseOrder(salesOrderNo: Code[20]; var _PurchaseOrderNo: Code[20]; var _PostedPurchaseInvoiceNo: Code[20])
     var
         _PurchHeader: Record "Purchase Header";
         _PurchInvHeader: Record "Purch. Inv. Header";
@@ -255,8 +278,119 @@ codeunit 50006 "IC Extended"
         if (_PurchaseOrderNo = '') and (_PostedPurchaseInvoceNo = '') then begin
             CreateICPurchaseOrder(SalesHeader);
             CreateDeliverySalesLine(SalesHeader."No.", SalesHeader."Sell-to Customer No.");
+            CreateItemChargeAssgnt(SalesHeader."No.", SalesHeader."Sell-to Customer No.");
         end;
         // end;
+    end;
+
+    procedure CreateItemChargeAssgnt(_salesOrderNo: Code[20]; _customerNo: Code[20])
+    var
+        _salesHeader: Record "Sales Header";
+        _salesLine: Record "Sales Line";
+        _customer: Record Customer;
+        _currency: Record Currency;
+        _itemChargeAssgntSales: Record "Item Charge Assignment (Sales)";
+        _itemChargeAssgntLineAmt: Decimal;
+        _assignItemChargeSales: Codeunit "Item Charge Assgnt. (Sales)";
+    begin
+        if not _salesHeader.Get(_salesHeader."Document Type"::Order, _salesOrderNo) then exit;
+        if not _customer.Get(_customerNo)
+            or (_customer."Sales No. Shipment Cost" = '')
+            or (_customer."Posting Type Shipment Cost" <> _customer."Posting Type Shipment Cost"::"Charge (Item)") then
+            exit;
+
+        with _salesLine do begin
+            SetCurrentKey(Type);
+            SetRange("Document Type", _salesHeader."Document Type");
+            SetRange("Document No.", _salesHeader."No.");
+            SetRange(Type, Type::"Charge (Item)");
+            SetRange("No.", _customer."Sales No. Shipment Cost");
+            if not FindFirst() then exit;
+
+            TestField("No.");
+            TestField(Quantity);
+
+            _currency.Initialize(_salesHeader."Currency Code");
+            if ("Inv. Discount Amount" = 0) AND ("Line Discount Amount" = 0) AND
+               (NOT _salesHeader."Prices Including VAT")
+            then
+                _itemChargeAssgntLineAmt := "Line Amount"
+            else
+                IF _salesHeader."Prices Including VAT" then
+                    _itemChargeAssgntLineAmt :=
+                      ROUND(CalcLineAmount / (1 + "VAT %" / 100), _currency."Amount Rounding Precision")
+                else
+                    _itemChargeAssgntLineAmt := CalcLineAmount;
+
+            _itemChargeAssgntSales.RESET;
+            _itemChargeAssgntSales.SETRANGE("Document Type", "Document Type");
+            _itemChargeAssgntSales.SETRANGE("Document No.", "Document No.");
+            _itemChargeAssgntSales.SETRANGE("Document Line No.", "Line No.");
+            _itemChargeAssgntSales.SETRANGE("Item Charge No.", "No.");
+            if not _itemChargeAssgntSales.FindLast() then begin
+                _itemChargeAssgntSales."Document Type" := "Document Type";
+                _itemChargeAssgntSales."Document No." := "Document No.";
+                _itemChargeAssgntSales."Document Line No." := "Line No.";
+                _itemChargeAssgntSales."Item Charge No." := "No.";
+                _itemChargeAssgntSales."Unit Cost" :=
+                  ROUND(_itemChargeAssgntLineAmt / Quantity, _currency."Unit-Amount Rounding Precision");
+            end;
+
+            _itemChargeAssgntLineAmt :=
+                  ROUND(_itemChargeAssgntLineAmt * ("Qty. to Invoice" / Quantity), _currency."Amount Rounding Precision");
+
+            _assignItemChargeSales.CreateDocChargeAssgn(_itemChargeAssgntSales, "Shipment No.");
+        end;
+        SuggestAssignment(_salesLine, _salesLine.Quantity, _itemChargeAssgntLineAmt);
+    end;
+
+    procedure SuggestAssignment(_salesLine: Record "Sales Line"; _totalQtyToAssign: Decimal; _totalAmtToAssign: Decimal)
+    var
+        _itemChargeAssgntSales: Record "Item Charge Assignment (Sales)";
+        _selection: Integer;
+        _suggestItemChargeMenuTxt: Text;
+        _selectionTxt: Text;
+        _assignItemChargeSales: Codeunit "Item Charge Assgnt. (Sales)";
+    begin
+        // with _salesLine do begin
+        //     TestField("Qty. to Invoice");
+        //     _itemChargeAssgntSales.SetRange("Document Type", "Document Type");
+        //     _itemChargeAssgntSales.SetRange("Document No.", "Document No.");
+        //     _itemChargeAssgntSales.SetRange("Document Line No.", "Line No.");
+        // END;
+        // IF _itemChargeAssgntSales.IsEmpty THEN
+        //     EXIT;
+
+
+        _selection := 1;
+        _suggestItemChargeMenuTxt :=
+          STRSUBSTNO('%1,%2,%3,%4', AssignEquallyMenuText, AssignByAmountMenuText, AssignByWeightMenuText, AssignByVolumeMenuText);
+        IF _itemChargeAssgntSales.COUNT > 1 THEN
+            _selection := 2;
+
+        _selectionTxt := SELECTSTR(_selection, _suggestItemChargeMenuTxt);
+
+        _assignItemChargeSales.AssignItemCharges(_salesLine, _totalQtyToAssign, _totalAmtToAssign, _selectionTxt);
+    end;
+
+    procedure AssignEquallyMenuText(): Text
+    begin
+        exit(EquallyTok)
+    end;
+
+    procedure AssignByAmountMenuText(): Text
+    begin
+        exit(ByAmountTok)
+    end;
+
+    procedure AssignByWeightMenuText(): Text
+    begin
+        exit(ByWeightTok)
+    end;
+
+    procedure AssignByVolumeMenuText(): Text
+    begin
+        exit(ByVolumeTok)
     end;
 
     procedure CreateDeliverySalesLine(_salesHeaderNo: Code[20]; _customerNo: Code[20])
@@ -269,7 +403,7 @@ codeunit 50006 "IC Extended"
         UpdatedStatus: Boolean;
     begin
         if (not _customer.Get(_customerNo))
-            // or (_customer."Sales No. Shipment Cost" = '')
+            or (_customer."Sales No. Shipment Cost" = '')
             or (not _salesHeader.Get(_salesHeader."Document Type"::Order, _salesHeaderNo))
             or (_salesHeader."ShipStation Shipment Amount" = 0) then
             exit;
@@ -413,6 +547,7 @@ codeunit 50006 "IC Extended"
                 ChangeCompany(ICPartner);
             SetCurrentKey("IC Partner Code");
             SetFilter("IC Partner Code", '<>%1', '');
+            SetRange(Blocked, Blocked::" ");
             if FindFirst() then
                 exit("No.")
             else
@@ -445,4 +580,8 @@ codeunit 50006 "IC Extended"
                                         RUS = 'Изменять поля в Межфирменном Заказ Продажи = %1 нельзя!';
         msgDeletePurchOrderAndICSalesOrder: TextConst ENU = 'Deleted Purchase Order = %1\Deleted Posted Purchase Order = %2\Deleted Sales Order = %3\Deleted Posted Sales Order = %4',
                                         RUS = 'Удален Заказ Покупки = %1\Удален Учтенный Заказ Покупки = %2\Удален Заказ Продажи = %3\Удален Учтенный Заказ Продажи = %4';
+        EquallyTok: TextConst ENU = 'Equally', RUS = 'Поровну';
+        ByAmountTok: TextConst ENU = 'By Amount', RUS = 'По сумме';
+        ByWeightTok: TextConst ENU = 'By Weight', RUS = 'По весу';
+        ByVolumeTok: TextConst ENU = 'By Volume', RUS = 'По объему';
 }

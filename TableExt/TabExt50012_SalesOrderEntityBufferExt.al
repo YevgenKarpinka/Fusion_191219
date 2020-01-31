@@ -7,7 +7,6 @@ tableextension 50012 "Sales Order Entity Buffer Ext." extends "Sales Order Entit
         {
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'ShipStation Shipment Amount', RUS = 'Сума отгрузки ShipStation';
-            Editable = false;
         }
     }
 }

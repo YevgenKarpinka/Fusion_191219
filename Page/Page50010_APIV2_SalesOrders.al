@@ -65,10 +65,10 @@ page 50010 "APIV2 - Sales Orders"
                     end;
                 }
                 // >>
-                field(shipstationShippingAmount; "ShipStation Shipment Amount")
+                field(shipstationShipmentAmount; "ShipStation Shipment Amount")
                 {
                     ApplicationArea = All;
-                    Caption = 'shipstationShippingAmount', Locked = true;
+                    Caption = 'shipstationShipmentAmount', Locked = true;
 
                     trigger OnValidate()
                     begin
