@@ -9,6 +9,7 @@ pageextension 50008 "Purchase Order Ext." extends "Purchase Order"
             {
                 ApplicationArea = All;
                 Editable = false;
+                Importance = Additional;
             }
         }
     }

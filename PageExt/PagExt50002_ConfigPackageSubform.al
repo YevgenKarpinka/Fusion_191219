@@ -38,7 +38,7 @@ pageextension 50002 "Config. Packages Ext." extends "Config. Package Subform"
 
                 trigger OnAction()
                 begin
-                    Export2JSON;
+                    // Export2JSON;
                 end;
             }
         }

@@ -9,6 +9,7 @@ pageextension 50011 "Posted Purchase Invoice Ext." extends "Posted Purchase Invo
             {
                 ApplicationArea = All;
                 Editable = false;
+                Importance = Additional;
             }
         }
     }

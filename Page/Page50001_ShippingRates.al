@@ -6,7 +6,7 @@ page 50001 "Shipping Rates"
     SourceTable = "Shipping Agent";
     SourceTableView = where("SS Code" = filter('<>'''''));
     Editable = false;
-    AccessByPermission = tabledata "Shipping Agent" = rimd;
+    AccessByPermission = tabledata "Shipping Agent" = r;
 
     layout
     {

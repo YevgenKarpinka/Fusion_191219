@@ -8,10 +8,12 @@ pageextension 50000 "Manufacturers Ext." extends Manufacturers
             field("Name RU"; "Name RU")
             {
                 ApplicationArea = All;
+                Importance = Additional;
             }
             field(Address; Address)
             {
                 ApplicationArea = All;
+                Importance = Additional;
             }
         }
     }

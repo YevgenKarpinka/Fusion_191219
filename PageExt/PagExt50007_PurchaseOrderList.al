@@ -1,10 +1,5 @@
 pageextension 50007 "Purchase Order List Ext." extends "Purchase Order List"
 {
-    layout
-    {
-        // Add changes to page layout here
-    }
-
     actions
     {
         // Add changes to page actions here

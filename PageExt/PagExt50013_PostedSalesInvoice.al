@@ -9,6 +9,7 @@ pageextension 50013 "Posted Sales Invoice Ext." extends "Posted Sales Invoice"
             {
                 ApplicationArea = All;
                 Editable = false;
+                Importance = Additional;
             }
         }
     }

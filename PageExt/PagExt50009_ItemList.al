@@ -30,33 +30,24 @@ pageextension 50009 "Item List Ext." extends "Item List"
 
                     trigger OnAction()
                     var
-                        ItemFilterGroupMgt: Codeunit "Item Filter Group Mgt.";
-                        ItemFilterGroup: Record "Item Filter Group";
-                        TempItemFilteredByGroup: Record Item temporary;
-                        TypeHelper: Codeunit "Type Helper";
+                        codTypeHelper: Codeunit "Type Helper";
+                        pageItemFilterByGroup: Page "Item Filter By Group";
                         CloseAction: Action;
                         FilterText: Text;
                         FilterPageID: Integer;
                         ParameterCount: Integer;
                     begin
-                        // ItemFilterGroupMgt.FillTempItemFilterGroup(TempItemFilterGroup);
-
-                        FilterPageID := Page::"Item Filter By Group";
-                        CloseAction := Page.RunModal(FilterPageID, ItemFilterGroup);
-                        if (CloseAction <> Action::LookupOK) then exit;
-
-                        if ItemFilterGroup.IsEmpty then begin
+                        Clear(pageItemFilterByGroup);
+                        pageItemFilterByGroup.LookupMode(true);
+                        if pageItemFilterByGroup.RunModal() = CloseAction::LookupCancel then exit;
+                        FilterText := pageItemFilterByGroup.GetFilterItems(ParameterCount);
+                        if FilterText = '' then begin
                             FilterGroup(0);
                             SetRange("No.");
                             exit;
                         end;
 
-                        TempItemFilteredByGroup.RESET;
-                        TempItemFilteredByGroup.DELETEALL;
-                        ItemFilterGroupMgt.GetFilteredItems(ItemFilterGroup, TempItemFilteredByGroup);
-                        FilterText := ItemFilterGroupMgt.GetItemNoFilter(TempItemFilteredByGroup, ParameterCount);
-
-                        if ParameterCount < TypeHelper.GetMaxNumberOfParametersInSQLQuery - 100 then begin
+                        if ParameterCount < codTypeHelper.GetMaxNumberOfParametersInSQLQuery - 100 then begin
                             FilterGroup(0);
                             MarkedOnly(false);
                             SetFilter("No.", FilterText);

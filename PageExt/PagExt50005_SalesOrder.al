@@ -7,6 +7,7 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
         {
             field("IC Document No."; "IC Document No.")
             {
+                Importance = Additional;
                 ApplicationArea = All;
                 Editable = false;
             }
@@ -15,6 +16,7 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
         {
             field("Agent Name"; GetShippingAgentName("Shipping Agent Code"))
             {
+                Importance = Additional;
                 ApplicationArea = All;
                 Style = Strong;
             }
@@ -23,6 +25,7 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
         {
             field("Service Description"; GetShippingAgentServiceDescription("Shipping Agent Code", "Shipping Agent Service Code"))
             {
+                Importance = Additional;
                 ApplicationArea = All;
                 Style = Strong;
             }
@@ -61,17 +64,17 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                 field("ShipStation Shipment Cost"; "ShipStation Shipment Cost")
                 {
                     ApplicationArea = All;
-
+                    Importance = Additional;
                 }
                 field("ShipStation Insurance Cost"; "ShipStation Insurance Cost")
                 {
                     ApplicationArea = All;
-
+                    Importance = Additional;
                 }
                 field("ShipStation Shipment ID"; "ShipStation Shipment ID")
                 {
                     ApplicationArea = All;
-
+                    Importance = Additional;
                 }
             }
         }

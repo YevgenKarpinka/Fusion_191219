@@ -12,20 +12,45 @@ page 50005 "Item Filter Group List"
         {
             repeater(RepeaterName)
             {
-                Editable = false;
-                field("Item No."; "Item No.")
+                Editable = IsEditable;
+                field(ItemNo; "Item No.")
                 {
                     ApplicationArea = All;
+                    Visible = visibleItemNo;
                 }
-                field("Filter Group"; "Filter Group")
+                field(FilterGroup; "Filter Group")
                 {
                     ApplicationArea = All;
+                    Visible = visibleGroup;
                 }
-                field("Filter Value"; "Filter Value")
+                field(FilterValue; "Filter Value")
                 {
                     ApplicationArea = All;
+                    Visible = visibleValue;
                 }
             }
         }
     }
+
+    trigger OnOpenPage()
+    begin
+        if GetFilters() = '' then begin
+            IsEditable := true;
+            exit;
+        end;
+
+        visibleItemNo := GetFilter("Item No.") <> '';
+        visibleGroup := GetFilter("Filter Group") <> '';
+        visibleValue := GetFilter("Filter Value") <> '';
+        IsEditable := false;
+
+        Reset();
+        FindFirst();
+    end;
+
+    var
+        IsEditable: Boolean;
+        visibleItemNo: Boolean;
+        visibleGroup: Boolean;
+        visibleValue: Boolean;
 }
