@@ -635,9 +635,13 @@ pageextension 50001 "Item Card Ext." extends "Item Card"
                 trigger OnAction()
                 var
                     _ItemFilterGroup: Record "Item Filter Group";
+                    itemFilterGroupList: Page "Item Filter Group List";
                 begin
                     _ItemFilterGroup.SetRange("Item No.", "No.");
-                    Page.RunModal(Page::"Item Filter Group List", _ItemFilterGroup);
+                    // Page.RunModal(Page::"Item Filter Group List", _ItemFilterGroup);
+                    itemFilterGroupList.SetInit(true);
+                    itemFilterGroupList.SetTableView(_ItemFilterGroup);
+                    itemFilterGroupList.RunModal();
                 end;
             }
         }

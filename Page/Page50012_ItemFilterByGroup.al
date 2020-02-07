@@ -15,6 +15,7 @@ page 50012 "Item Filter By Group"
                 ApplicationArea = Basic, Suite;
                 CaptionML = ENU = 'Filter By Item No.', RUS = 'Фильтр по Товару';
                 Lookup = true;
+                Visible = false;
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin

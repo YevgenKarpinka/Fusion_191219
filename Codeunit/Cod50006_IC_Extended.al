@@ -460,6 +460,7 @@ codeunit 50006 "IC Extended"
     begin
         if (SalesHeader."Document Type" <> SalesHeader."Document Type"::Order) or (SalesInvHdrNo = '') then exit;
 
+        // Update Purchase Document No
         _ICPartner.SetCurrentKey("Customer No.");
         _ICPartner.SetRange("Customer No.", SalesHeader."Sell-to Customer No.");
         if _ICPartner.FindFirst()
@@ -467,6 +468,10 @@ codeunit 50006 "IC Extended"
         and _ICPurchHeader.Get(_ICPurchHeader."Document Type"::Order, SalesHeader."External Document No.") then begin
             _ICPurchHeader."Vendor Invoice No." := SalesInvHdrNo;
             _ICPurchHeader.Modify();
+        end;
+        // Update Status = Shipped Sales Order into Site
+        if SalesHeader."External Document No." <> '' then begin
+            ShipStationMgt.SentOrderShipmentStatusForWooComerse(SalesHeader."No.", 1);
         end;
     end;
 
@@ -482,8 +487,10 @@ codeunit 50006 "IC Extended"
             exit;
 
         if _ICSalesHeader.Get(_ICSalesHeader."Document Type"::Order, PurchaseHeader."IC Document No.") then begin
+            // Update Purchase Document No
             _ICSalesHeader."External Document No." := PurchInvHdrNo;
             _ICSalesHeader.Modify();
+            // AutoReserv for each line with Item
             _ICSalesLine.SetCurrentKey(Type, Quantity);
             _ICSalesLine.SetRange("Document Type", _ICSalesLine."Document Type"::Order);
             _ICSalesLine.SetRange("Document No.", _ICSalesHeader."No.");
@@ -492,6 +499,8 @@ codeunit 50006 "IC Extended"
             if _ICSalesLine.FindSet(true, false) then begin
                 _ICSalesLine.AutoReserve();
             end;
+            // Update Status = Assembled Sales Order into Site
+            ShipStationMgt.SentOrderShipmentStatusForWooComerse(_ICSalesHeader."No.", 0);
         end;
     end;
 
@@ -559,6 +568,7 @@ codeunit 50006 "IC Extended"
         CopyDocumentMgt: Codeunit "Copy Document Mgt.";
         ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+        ShipStationMgt: Codeunit "ShipStation Mgt.";
         ReleaseMode: Boolean;
         errPurchOrderPosted: TextConst ENU = 'Reopen Sales Order = %1 not allowed!\Purchase Order = %2 Posted!',
                                         RUS = 'Открыть Заказ Продажи = %1 нельзя!\Заказ Покупки = %2 учтен!';

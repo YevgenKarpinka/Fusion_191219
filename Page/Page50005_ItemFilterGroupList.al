@@ -34,18 +34,26 @@ page 50005 "Item Filter Group List"
 
     trigger OnOpenPage()
     begin
-        if GetFilters() = '' then begin
+        if (GetFilters() = '') or IsEditable then begin
+            visibleItemNo := true;
+            visibleGroup := true;
+            visibleValue := true;
             IsEditable := true;
             exit;
         end;
 
-        visibleItemNo := GetFilter("Item No.") <> '';
-        visibleGroup := GetFilter("Filter Group") <> '';
-        visibleValue := GetFilter("Filter Value") <> '';
+        // visibleItemNo := (GetFilter("Item No.") <> '') or (GetFilter("Filter Group") <> '') or (GetFilter("Filter Value") <> '');
+        visibleGroup := (GetFilter("Filter Group") <> '') or (GetFilter("Filter Value") <> '');
+        visibleValue := (GetFilter("Filter Value") <> '');
         IsEditable := false;
 
         Reset();
         FindFirst();
+    end;
+
+    procedure SetInit(_isEditable: Boolean)
+    begin
+        IsEditable := _isEditable;
     end;
 
     var

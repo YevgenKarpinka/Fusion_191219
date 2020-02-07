@@ -31,7 +31,7 @@ codeunit 50009 "Item Filter Group Mgt."
         end;
     end;
 
-    procedure OnLookUpGroup(var filterByGroup: Text; var locItemFilterGroup: Record "Item Filter Group")
+    procedure OnLookUpGroup(var filterByGroup: Text; locItemFilterGroup: Record "Item Filter Group")
     var
         tempItemFilterGroup: Record "Item Filter Group" temporary;
     begin
@@ -57,15 +57,17 @@ codeunit 50009 "Item Filter Group Mgt."
         end;
     end;
 
-    procedure OnLookUpValue(var filterByValue: Text; var locItemFilterGroup: Record "Item Filter Group")
+    procedure OnLookUpValue(var filterByValue: Text; var _ItemFilterGroup: Record "Item Filter Group")
     var
         tempItemFilterGroup: Record "Item Filter Group" temporary;
+        locItemFilterGroup: Record "Item Filter Group";
     begin
         if not tempItemFilterGroup.IsTemporary then exit;
         tempItemFilterGroup.Reset();
         tempItemFilterGroup.DeleteAll();
 
         with locItemFilterGroup do begin
+            SetFilter("Filter Group", _ItemFilterGroup.GetFilter("Filter Group"));
             FindSet(false, false);
             repeat
                 tempItemFilterGroup.SetRange("Filter Value", "Filter Value");
