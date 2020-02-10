@@ -66,4 +66,40 @@ page 50011 "Sales Lines List"
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        salesHeader: Record "Sales Header";
+        salesLine: Record "Sales Line";
+    begin
+        with tempSalesLine do begin
+            salesLine.FindSet(false, false);
+            repeat
+                if not salesHeader.Get(salesLine."Document Type", salesLine."Document No.") then begin
+                    tempSalesLine.TransferFields(salesLine);
+                    tempSalesLine.Insert();
+                end;
+            until salesLine.Next() = 0;
+        end;
+    end;
+
+    trigger OnFindRecord(Which: Text): Boolean
+    var
+        Found: Boolean;
+    begin
+        // RunOnTempRec := not tempSalesLine.IsEmpty;
+        RunOnTempRec := true;
+        if RunOnTempRec then begin
+            tempSalesLine.Copy(Rec);
+            Found := tempSalesLine.Find(Which);
+            if Found then
+                Rec := tempSalesLine;
+            exit(Found);
+        end;
+        exit(Find(Which));
+    end;
+
+    var
+        tempSalesLine: Record "Sales Line" temporary;
+        RunOnTempRec: Boolean;
 }
