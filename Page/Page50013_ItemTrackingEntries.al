@@ -4,7 +4,6 @@ page 50013 "Item Tracking Entries FactBox"
     ApplicationArea = Basic, Suite;
     UsageCategory = History;
     SourceTable = "Item Ledger Entry";
-    SourceTableView = where("Remaining Quantity" = filter(> 0));
     CaptionML = ENU = 'Item Tracking Entries', RUS = 'Операции трассировки товара';
     AccessByPermission = tabledata "Item Ledger Entry" = r;
     Editable = false;
@@ -50,23 +49,4 @@ page 50013 "Item Tracking Entries FactBox"
             }
         }
     }
-
-    actions
-    {
-        area(Processing)
-        {
-            action(ActionName)
-            {
-                ApplicationArea = All;
-
-                trigger OnAction()
-                begin
-
-                end;
-            }
-        }
-    }
-
-    var
-        myInt: Integer;
 }
