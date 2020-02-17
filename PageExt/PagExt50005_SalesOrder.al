@@ -3,6 +3,15 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
     layout
     {
         // Add changes to page layout here
+        addfirst(factboxes)
+        {
+            part(ItemTrackingEntries; "Item Tracking Entries FactBox")
+            {
+                ApplicationArea = Basic, Suite;
+                Provider = SalesLines;
+                SubPageLink = "Item No." = field("No.");
+            }
+        }
         addafter(Status)
         {
             field("IC Document No."; "IC Document No.")
