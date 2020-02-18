@@ -30,10 +30,6 @@ page 50013 "Item Tracking Entries FactBox"
                 {
                     ApplicationArea = All;
                 }
-                field("Document No."; "Document No.")
-                {
-                    ApplicationArea = All;
-                }
                 field("Serial No."; "Serial No.")
                 {
                     ApplicationArea = All;
@@ -43,6 +39,14 @@ page 50013 "Item Tracking Entries FactBox"
                     ApplicationArea = All;
                 }
                 field("Item No."; "Item No.")
+                {
+                    ApplicationArea = All;
+                }
+                field("Document No."; "Document No.")
+                {
+                    ApplicationArea = All;
+                }
+                field("Document Date"; "Document Date")
                 {
                     ApplicationArea = All;
                 }
