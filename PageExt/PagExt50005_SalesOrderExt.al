@@ -11,6 +11,7 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                 Provider = SalesLines;
                 SubPageLink = "Item No." = field("No.");
                 SubPageView = sorting("Expiration Date") where("Remaining Quantity" = filter(> 0));
+                Visible = isVisible;
             }
         }
         addafter(Status)
@@ -233,6 +234,12 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        isVisible := true;
+    end;
+
     var
         salesOrderNotRegisterInShipStation: TextConst ENU = 'Sales Order %1 Not Register In ShipStation', RUS = 'Заказ Продажи %1 не создан в ShipStation';
+        isVisible: Boolean;
 }
