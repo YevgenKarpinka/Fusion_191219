@@ -94,16 +94,6 @@ table 50003 "Bank Check Journal Line"
         SetLastModifiedDateTime();
     end;
 
-    trigger OnDelete()
-    begin
-
-    end;
-
-    trigger OnRename()
-    begin
-
-    end;
-
     local procedure SetLastModifiedDateTime()
     begin
         "Last Modified DateTime" := CurrentDateTime;

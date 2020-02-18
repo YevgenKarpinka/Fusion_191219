@@ -234,5 +234,5 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
     }
 
     var
-        salesOrderNotRegisterInShipStation: TextConst ENU = 'Sales Order %1 Not Register In ShipStation', RUS = 'Заказ Продажи %1 не создан в ShipStation';
+        salesOrderNotRegisterInShipStation: TextConst ENU = 'Sales Order %1 Not Register In ShipStation', RUS = 'Заказ Продажи %1 не зарегистророван в ShipStation';
 }

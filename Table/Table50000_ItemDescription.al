@@ -206,22 +206,6 @@ table 50000 "Item Description"
         }
     }
 
-    trigger OnInsert()
-    begin
-    end;
-
-    trigger OnModify()
-    begin
-    end;
-
-    trigger OnDelete()
-    begin
-    end;
-
-    trigger OnRename()
-    begin
-    end;
-
     procedure InitItemDescription(ItemNo: Code[20])
     begin
         Init();

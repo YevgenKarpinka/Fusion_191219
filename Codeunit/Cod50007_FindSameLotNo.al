@@ -30,7 +30,8 @@ codeunit 50007 "Find Same Lot No"
         locWarehouseActivityHeader: Record "Warehouse Activity Header";
     begin
         with locWarehouseActivityHeader do
-            if Get(WarehouseActivityLine."Action Type", WarehouseActivityLine."No.") and (("Source No." = '') or ("Source Document" = 0)) then begin
+            if Get(WarehouseActivityLine."Action Type", WarehouseActivityLine."No.") and (("Source No." = '') or ("Source Document" = 0))
+                and (WarehouseActivityLine."Source No." <> '') and (WarehouseActivityLine."Source Document" <> 0) then begin
                 "Source Document" := WarehouseActivityLine."Source Document";
                 "Source No." := WarehouseActivityLine."Source No.";
                 Modify();

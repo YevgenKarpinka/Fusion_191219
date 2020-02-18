@@ -49,4 +49,20 @@ codeunit 50004 "Caption Mgt."
     begin
         exit(Format(Date2Format, 0, '<Month,2>/<Day,2>/<Year4>'));
     end;
+
+    procedure ItemTrackingEntryExist(ItemNo: Code[20]): Boolean
+    var
+        locItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        with locItemLedgerEntry do begin
+            SetCurrentKey("Item No.", Positive, "Remaining Quantity");
+            SetRange("Item No.", ItemNo);
+            SetRange(Positive, true);
+            SetFilter("Remaining Quantity", '>%1', 0);
+            if IsEmpty then
+                exit(false)
+            else
+                exit(true);
+        end;
+    end;
 }
