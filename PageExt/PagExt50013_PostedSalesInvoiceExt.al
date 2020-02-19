@@ -3,6 +3,16 @@ pageextension 50013 "Posted Sales Invoice Ext." extends "Posted Sales Invoice"
     layout
     {
         // Add changes to page layout here
+        addfirst(factboxes)
+        {
+            part(ItemTrackingEntries; "Post.Item Track.Entr.FackBox")
+            {
+                ApplicationArea = Basic, Suite;
+                Provider = SalesInvLines;
+                SubPageLink = "Document No." = field("Document No."), "Document Line No." = field("Line No.");
+                // SubPageView = where (ad)
+            }
+        }
         addafter(Closed)
         {
             field("IC Document No."; "IC Document No.")

@@ -12,6 +12,13 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
                 SubPageLink = "Item No." = field("No.");
                 SubPageView = sorting("Expiration Date") where("Remaining Quantity" = filter(> 0));
             }
+            part(ItemTrackingLine; "Item Tracking Line FactBox")
+            {
+                ApplicationArea = Basic, Suite;
+                Provider = SalesLines;
+                SubPageLink = "Item No." = field("No."), "Source ID" = field("Document No."), "Source Ref. No." = field("Line No.");
+                SubPageView = sorting("Lot No.") where("Item Tracking" = const("Lot No."));
+            }
         }
         addafter(Status)
         {
