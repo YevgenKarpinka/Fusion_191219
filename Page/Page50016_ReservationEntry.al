@@ -36,6 +36,14 @@ page 50016 "Reservation Entry List"
                 {
                     ApplicationArea = All;
                 }
+                field(Quantity; Quantity)
+                {
+                    ApplicationArea = All;
+                }
+                field("Expiration Date"; "Expiration Date")
+                {
+                    ApplicationArea = All;
+                }
             }
         }
     }

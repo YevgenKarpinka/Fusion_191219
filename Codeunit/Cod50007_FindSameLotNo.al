@@ -29,12 +29,12 @@ codeunit 50007 "Find Same Lot No"
     var
         locWarehouseActivityHeader: Record "Warehouse Activity Header";
     begin
-        with locWarehouseActivityHeader do
-            if Get(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.") and (("Source No." = '') or ("Source Document" = 0))
-                and (WarehouseActivityLine."Source No." <> '') and (WarehouseActivityLine."Source Document" <> 0) then begin
-                "Source Document" := WarehouseActivityLine."Source Document";
-                "Source No." := WarehouseActivityLine."Source No.";
-                Modify();
-            end;
+        // with locWarehouseActivityHeader do
+        //     if Get(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.") and (("Source No." = '') or ("Source Document" = 0))
+        //         and (WarehouseActivityLine."Source No." <> '') and (WarehouseActivityLine."Source Document" <> 0) then begin
+        //         "Source Document" := WarehouseActivityLine."Source Document";
+        //         "Source No." := WarehouseActivityLine."Source No.";
+        //         Modify();
+        //     end;
     end;
 }

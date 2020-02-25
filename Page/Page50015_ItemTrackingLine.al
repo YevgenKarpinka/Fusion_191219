@@ -18,7 +18,7 @@ page 50015 "Item Tracking Line FactBox"
                 {
                     ApplicationArea = All;
                 }
-                field("Expiration Date"; "Expiration Date")
+                field("Expiration Date"; itemTrackingMgt.GetItemTrackingExpirationDateByLotNo("Lot No.", "Item No."))
                 {
                     ApplicationArea = All;
                 }
@@ -30,7 +30,7 @@ page 50015 "Item Tracking Line FactBox"
                 {
                     ApplicationArea = All;
                 }
-                field("Warranty Date"; "Warranty Date")
+                field("Warranty Date"; itemTrackingMgt.GetItemTrackingWarrantyDateByLotNo("Lot No.", "Item No."))
                 {
                     ApplicationArea = All;
                 }
@@ -38,4 +38,7 @@ page 50015 "Item Tracking Line FactBox"
             }
         }
     }
+
+    var
+        itemTrackingMgt: Codeunit "Item Tracking Mgt.";
 }

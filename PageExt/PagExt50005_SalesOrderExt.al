@@ -100,6 +100,21 @@ pageextension 50005 "Sales Order Ext." extends "Sales Order"
     actions
     {
         // Add changes to page actions here
+        addafter("Warehouse Shipment Lines")
+        {
+            action(PickLines)
+            {
+                ApplicationArea = Warehouse;
+                Image = PickLines;
+                CaptionML = ENU = 'Pick Lines', RUS = 'Строки подбора';
+                ToolTipML = ENU = 'View the related picks.', RUS = 'Просмотр связанных подборов.';
+                Promoted = true;
+                PromotedCategory = Process;
+                RunObject = Page "Warehouse Activity Lines";
+                RunPageView = SORTING("Whse. Document No.", "Whse. Document Type", "Activity Type") WHERE("Activity Type" = CONST(Pick));
+                RunPageLink = "Source Document" = CONST("Sales Order"), "Source No." = FIELD("No.");
+            }
+        }
         addafter("Pick Instruction")
         {
             action("Sales Order Fusion")
