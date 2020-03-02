@@ -12,7 +12,7 @@ tableextension 50001 "Item Ext." extends Item
         }
         field(50001; "Brand Code"; Code[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             TableRelation = Brand;
 
             trigger OnValidate()
@@ -49,22 +49,22 @@ tableextension 50001 "Item Ext." extends Item
         }
         field(50004; "Baby Care"; Boolean)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'Baby Care', RUS = 'Забота о ребенке';
         }
         field(50005; "Web Item"; Boolean)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'Web Item', RUS = 'Web товар';
         }
         field(50006; "Item Form"; Text[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'Item Form', RUS = 'Форма товара';
         }
         field(50007; "Transfered to eShop"; Boolean)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'Transfered to eShop', RUS = 'Отправлено в eShop';
         }
     }

@@ -33,6 +33,6 @@
     }
   ],
   "contextSensitiveHelpUrl": "https://Fusion_191219.com/help/",
-  "showMyCode": true,
+  "showMyCode": false,
   "runtime": "4.0"
 }

@@ -26,6 +26,9 @@ codeunit 50001 "ShipStation Mgt."
         IsSuccessStatusCode: Boolean;
         _captionMgt: Codeunit "Caption Mgt.";
     begin
+        GetShipStationSetup();
+        if not glShipStationSetup."Order Status Update" then exit;
+
         _jsonOrderShipmentStatus := CreateJsonOrderShipmentStatusForWooComerse(_salesOrderNo, locShippedStatus);
         if not _jsonOrderShipmentStatus.Get('id', _jsonToken) then exit;
         _jsonOrderShipmentStatus.WriteTo(_jsonText);
@@ -60,7 +63,7 @@ codeunit 50001 "ShipStation Mgt."
         //     end;
         // end;
         _jsonObject.Add('id', _salesOrderNo);
-        _jsonObject.Add('status', _shippedStatus);
+        // _jsonObject.Add('status', _shippedStatus);
         if locShippedStatus = 0 then begin
             _jsonObject.Add('status', _assemblededStatus);
             _jsonObject.Add('trackId', _jsonNullArray);
@@ -281,6 +284,9 @@ codeunit 50001 "ShipStation Mgt."
         JSObjectHeader: JsonObject;
         jsonTagsArray: JsonArray;
     begin
+        GetShipStationSetup();
+        if not glShipStationSetup."ShipStation Integration Enable" then exit;
+
         if (DocNo = '') or (not _SH.Get(_SH."Document Type"::Order, DocNo)) then exit(false);
 
         _Cust.Get(_SH."Sell-to Customer No.");
@@ -674,6 +680,9 @@ codeunit 50001 "ShipStation Mgt."
         WhseShipDocNo: Code[20];
         errorShipStationOrderNotExist: TextConst ENU = 'ShipStation Order is not Existed!';
     begin
+        GetShipStationSetup();
+        if not glShipStationSetup."ShipStation Integration Enable" then exit;
+
         if (DocNo = '') or (not _SH.Get(_SH."Document Type"::Order, DocNo)) or (_SH."ShipStation Order ID" = '') then Error(errorShipStationOrderNotExist);
         // comment to test Create Label and Attache to Warehouse Shipment
         if not FindWarehouseSipment(DocNo, WhseShipDocNo) then Error(errorWhseShipNotExist, DocNo);
@@ -718,6 +727,9 @@ codeunit 50001 "ShipStation Mgt."
         JSObject: JsonObject;
         WhseShipDocNo: Code[20];
     begin
+        GetShipStationSetup();
+        if not glShipStationSetup."ShipStation Integration Enable" then exit;
+
         if (DocNo = '') or (not _SH.Get(_SH."Document Type"::Order, DocNo)) or (_SH."ShipStation Shipment ID" = '') then exit(false);
 
         // Void Label in Shipstation
@@ -1183,7 +1195,6 @@ codeunit 50001 "ShipStation Mgt."
         ShippingAgent: Record "Shipping Agent";
     begin
         JSText := Connect2ShipStation(6, '', _SSAgentCode);
-        // Error('After Get _SSAgentCode');
         JSObject.ReadFrom(JSText);
         txtCarrierCode := CopyStr(GetJSToken(JSObject, 'code').AsValue().AsText(), 1, MaxStrLen(ShippingAgent."SS Code"));
         ShippingAgent.SetCurrentKey("SS Code");
@@ -1404,7 +1415,17 @@ codeunit 50001 "ShipStation Mgt."
         if CompanyInfo.Get() then exit(CompanyInfo."Ship-to Post Code");
     end;
 
+    local procedure GetShipStationSetup()
+    begin
+        with glShipStationSetup do
+            if not Get() then begin
+                Init();
+                Insert();
+            end;
+    end;
+
     var
+        glShipStationSetup: Record "ShipStation Setup";
         testMode: Boolean;
         errCarrierIsNull: TextConst ENU = 'Not Carrier Into ShipStation In Order = %1', RUS = 'В Заказе = %1 ShipStation не оппределен Перевозчик';
         errServiceIsNull: TextConst ENU = 'Not Service Into ShipStation In Order = %1', RUS = 'В Заказе = %1 ShipStation не оппределен Сервис';

@@ -7,13 +7,13 @@ table 50003 "Bank Check Journal Line"
     {
         field(1; ID; Integer)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = SystemMetadata;
             AutoIncrement = true;
             Editable = false;
         }
         field(2; "Customer No."; Code[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             TableRelation = Customer;
 
             trigger OnValidate()
@@ -24,50 +24,50 @@ table 50003 "Bank Check Journal Line"
         }
         field(3; "Bank Check No."; Code[35])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
 
         }
         field(4; "Bank Check Date"; Date)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
 
         }
         field(5; Description; Text[100])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
 
         }
         field(6; Amount; Decimal)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
 
         }
         field(7; "Source Type"; Option)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'Source Type', RUS = 'Тип Источника';
             OptionMembers = " ",SalesOrder,SalesInvoice;
             OptionCaptionML = ENU = ' ,SalesOrder,SalesInvoice', RUS = ' ,ЗаказПродажи,СчетПродажи';
         }
         field(8; "Source No."; Code[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             TableRelation = IF ("Source Type" = CONST(SalesOrder)) "Sales Header"."No." WHERE("Document Type" = CONST(Order), "Sell-to Customer No." = field("Customer No.")) ELSE
             IF ("Source Type" = CONST(SalesInvoice)) "Sales Invoice Header"."No." WHERE("Sell-to Customer No." = field("Customer No."));
         }
         field(9; "Last Modified DateTime"; DateTime)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(10; "User ID"; Code[50])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             Editable = false;
         }
         field(11; Status; Option)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'Status', RUS = 'Статус';
             OptionMembers = New,Confirmed,Rejected;
             OptionCaptionML = ENU = 'New,Confirmed,Rejected', RUS = 'Новый,Подтвержденный,Отказаный';

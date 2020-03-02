@@ -6,15 +6,15 @@ table 50001 Brand
     {
         field(1; "Code"; Code[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = SystemMetadata;
         }
         field(2; "Manufacturer Code"; Code[10])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
         }
         field(3; Name; Text[50])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
         }
     }
     keys

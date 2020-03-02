@@ -7,12 +7,12 @@ table 50002 "Source Parameters"
     {
         field(1; Code; Code[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = SystemMetadata;
             CaptionML = ENU = 'Code', RUS = 'Код';
         }
         field(2; "FSp RestMethod"; Option)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'FSp RestMethod', RUS = 'FSp RestMethod';
             OptionMembers = GET,POST;
             OptionCaptionML = ENU = 'GET,POST', RUS = 'GET,POST';
@@ -20,18 +20,18 @@ table 50002 "Source Parameters"
         }
         field(3; "FSp URL"; Text[200])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'FSp URL', RUS = 'FSp URL';
             NotBlank = true;
         }
         field(4; "FSp Accept"; Code[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'FSp Accept', RUS = 'FSp Accept';
         }
         field(5; "FSp AuthorizationFrameworkType"; Option)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'FSp Authorization Framework Type', RUS = 'FSp Authorization Framework Type';
             OptionMembers = " ",BasicHTTP,OAuth2;
             OptionCaptionML = ENU = ' ,Basic HTTP,OAuth2', RUS = ' ,Basic HTTP,OAuth2';
@@ -39,31 +39,31 @@ table 50002 "Source Parameters"
         }
         field(6; "FSp AuthorizationToken"; Text[200])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'FSp Authorization Token', RUS = 'FSp Authorization Token';
         }
         field(7; "FSp UserName"; Text[100])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'FSp UserName', RUS = 'FSp UserName';
             NotBlank = true;
         }
         field(8; "FSp Password"; Text[100])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'FSp Password', RUS = 'FSp Password';
             NotBlank = true;
         }
         field(9; "FSp ContentType"; Option)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'FSp ContentType', RUS = 'FSp ContentType';
             OptionMembers = " ","application/json","application/x-www-form-urlencoded";
             OptionCaptionML = ENU = ' ,application/json,application/x-www-form-urlencoded', RUS = ' ,application/json,application/x-www-form-urlencoded';
         }
         field(10; "FSp ETag"; Text[100])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'FSp E-Tag', RUS = 'FSp E-Tag';
         }
         field(11; "FSp Event"; Option)

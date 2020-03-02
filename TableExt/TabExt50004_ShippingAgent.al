@@ -5,13 +5,13 @@ tableextension 50004 "Shipping Agent Ext." extends "Shipping Agent"
         // Add changes to table fields here
         field(50000; "SS Code"; Text[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Code', RUS = 'ShipStation код';
             Editable = false;
         }
         field(50001; "SS Provider Id"; Integer)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Provider ID', RUS = 'ShipStation провайдер ИД';
             Editable = false;
         }

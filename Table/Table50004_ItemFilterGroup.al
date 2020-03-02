@@ -6,16 +6,16 @@ table 50004 "Item Filter Group"
     {
         field(1; "Item No."; Code[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = SystemMetadata;
             TableRelation = Item;
         }
         field(2; "Filter Group"; Text[50])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
         }
         field(3; "Filter Value"; Text[100])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
         }
     }
 

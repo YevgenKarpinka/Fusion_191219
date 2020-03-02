@@ -5,25 +5,25 @@ tableextension 50005 "Shipping Agent Services Ext." extends "Shipping Agent Serv
         // Add changes to table fields here
         field(50000; "SS Carrier Code"; Text[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Carrier Code', RUS = 'ShipStation курьер код';
             Editable = false;
         }
         field(50001; "SS Code"; Text[50])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Code', RUS = 'ShipStation код';
             Editable = false;
         }
         field(50002; "Shipment Cost"; Decimal)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'Shipment Cost', RUS = 'Стоимость доставки';
             Editable = false;
         }
         field(50003; "Other Cost"; Decimal)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'Other Cost', RUS = 'Иная стоимость';
             Editable = false;
         }

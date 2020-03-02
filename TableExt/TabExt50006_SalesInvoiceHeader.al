@@ -5,17 +5,19 @@ tableextension 50006 "Sales Invoice Header Ext." extends "Sales Invoice Header"
         // Add changes to table fields here
         field(50000; "ShipStation Order ID"; Text[20])
         {
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Order ID', RUS = 'Идентификатор Заказа ShipStation ';
             Editable = false;
         }
         field(50001; "ShipStation Order Key"; Text[50])
         {
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Order Key', RUS = 'Ключ Заказа ShipStation';
             Editable = false;
         }
         field(50002; "ShipStation Order Status"; Option)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             OptionMembers = "Not Sent",Sent,Received;
             OptionCaptionML = ENU = 'Not Sent,Sent,Received', RUS = 'Не отправлен,Отправлен,Получен';
             CaptionML = ENU = 'ShipStation Order Status', RUS = 'Статус Заказа ShipStation';
@@ -23,36 +25,36 @@ tableextension 50006 "Sales Invoice Header Ext." extends "Sales Invoice Header"
         }
         field(50003; "ShipStation Status"; Text[50])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Status', RUS = 'Статус ShipStation';
             Editable = false;
         }
         field(50004; "ShipStation Shipment Cost"; Decimal)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Shipment Cost', RUS = 'Сума отгрузки ShipStation';
             Editable = false;
         }
         field(50005; "ShipStation Insurance Cost"; Decimal)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Insurance Cost', RUS = 'Сума страховки ShipStation';
             Editable = false;
         }
         field(50006; "ShipStation Shipment ID"; Text[30])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Shipment ID', RUS = 'ID Отгрузки ShipStation';
             Editable = false;
         }
         field(50007; "ShipStation Shipment Amount"; Decimal)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Shipment Amount', RUS = 'Сума отгрузки ShipStation';
         }
         field(50008; "IC Document No."; Code[20])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             CaptionML = ENU = 'IC Document No.', RUS = 'МФ Документ Но.';
         }
     }
