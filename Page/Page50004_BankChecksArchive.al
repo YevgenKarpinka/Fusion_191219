@@ -45,18 +45,22 @@ page 50004 "Bank Checks Archive"
                 field("Source No."; "Source No.")
                 {
                     ApplicationArea = All;
+                    Visible = false;
                 }
                 field("Source Type"; "Source Type")
                 {
                     ApplicationArea = All;
+                    Visible = false;
                 }
                 field("Last Modified DateTime"; "Last Modified DateTime")
                 {
                     ApplicationArea = All;
+                    // Visible = false;
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    Visible = false;
                 }
             }
         }

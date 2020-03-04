@@ -470,9 +470,11 @@ codeunit 50006 "IC Extended"
             _ICPurchHeader.Modify();
         end;
         // Update Status = Shipped Sales Order into Site
-        if SalesHeader."External Document No." <> '' then begin
-            ShipStationMgt.SentOrderShipmentStatusForWooComerse(SalesHeader."No.", 1);
-        end;
+        GetShipStationSetup();
+        if glShipStationSetup."Order Status Update" then
+            if SalesHeader."External Document No." <> '' then begin
+                ShipStationMgt.SentOrderShipmentStatusForWooComerse(SalesHeader."No.", 1);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnAfterPostPurchaseDoc', '', false, false)]
@@ -500,7 +502,9 @@ codeunit 50006 "IC Extended"
                 _ICSalesLine.AutoReserve();
             end;
             // Update Status = Assembled Sales Order into Site
-            ShipStationMgt.SentOrderShipmentStatusForWooComerse(_ICSalesHeader."No.", 0);
+            GetShipStationSetup();
+            if glShipStationSetup."Order Status Update" then
+                ShipStationMgt.SentOrderShipmentStatusForWooComerse(_ICSalesHeader."No.", 0);
         end;
     end;
 
@@ -564,7 +568,17 @@ codeunit 50006 "IC Extended"
         end;
     end;
 
+    local procedure GetShipStationSetup()
+    begin
+        if not glShipStationSetupGetted then begin
+            glShipStationSetup.Get();
+            glShipStationSetupGetted := true;
+        end;
+    end;
+
     var
+        glShipStationSetupGetted: Boolean;
+        glShipStationSetup: Record "ShipStation Setup";
         CopyDocumentMgt: Codeunit "Copy Document Mgt.";
         ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";

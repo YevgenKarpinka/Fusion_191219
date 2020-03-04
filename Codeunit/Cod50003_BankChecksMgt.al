@@ -57,7 +57,10 @@ codeunit 50003 "Bank Checks Mgt."
             if not IsEmpty then
                 exit; // instead; go to the document
 
-            if PostedBankCheckExist(_BankCheck."Bank Check No.") then exit;
+            if PostedBankCheckExist(_BankCheck."Bank Check No.") then begin
+                Message(msgBankCheckNoExist, _BankCheck."Bank Check No.");
+                exit;
+            end;
 
             SetRange("External Document No.");
             SetRange("Document Date");
@@ -92,7 +95,7 @@ codeunit 50003 "Bank Checks Mgt."
             "External Document No." := _BankCheck."Bank Check No.";
 
             "Source Code" := GenJnlTemplate."Source Code";
-            "Reason Code" := GenJnlBatch."Reason Code";
+            // "Reason Code" := GenJnlBatch."Reason Code";
             "Posting No. Series" := GenJnlBatch."Posting No. Series";
             "System-Created Entry" := true;
 
@@ -117,4 +120,5 @@ codeunit 50003 "Bank Checks Mgt."
     var
         GLSetup: Record "General Ledger Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        msgBankCheckNoExist: TextConst ENU = 'Bank Check No = %1 Exist!', RUS = 'Банковский Чек Но = %1 существует!';
 }
