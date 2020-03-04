@@ -66,11 +66,11 @@ page 50004 "Bank Checks Archive"
     {
         area(Processing)
         {
-            action(Update2New)
+            action(ReturnToJournal)
             {
                 ApplicationArea = All;
                 Image = Approval;
-                CaptionML = ENU = 'Update2New', RUS = 'Update2New';
+                CaptionML = ENU = 'Return to Journal', RUS = 'Вернуть в журнал';
 
                 trigger OnAction()
                 var

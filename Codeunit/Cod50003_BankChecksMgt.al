@@ -47,7 +47,7 @@ codeunit 50003 "Bank Checks Mgt."
         GenJnlBatch.GET(GLSetup."Journal Template Name", GLSetup."Journal Batch Name");
         GenJnlBatch.TestField("No. Series");
         GenJnlTemplate.TestField("Source Code");
-        GenJnlBatch.TestField("Reason Code");
+        // GenJnlBatch.TestField("Reason Code");
 
         with procesGenJnlLine do begin
             SetRange("Journal Template Name", GLSetup."Journal Template Name");
